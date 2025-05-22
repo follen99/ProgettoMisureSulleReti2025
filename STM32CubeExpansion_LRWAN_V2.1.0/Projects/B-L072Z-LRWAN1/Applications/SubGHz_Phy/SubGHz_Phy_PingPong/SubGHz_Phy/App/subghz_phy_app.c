@@ -42,6 +42,8 @@
 #include "stm32_timer.h"
 #include "stm32_seq.h"
 #include "utilities_def.h"
+
+#include "app_gnss.h"
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/

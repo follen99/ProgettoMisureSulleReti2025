@@ -1,0 +1,4 @@
+../Application/App/app_gnss.c:69:6:MX_GNSS_Init	2
+../Application/App/app_gnss.c:88:6:MX_GNSS_Process	6
+../Application/App/app_gnss.c:220:5:GNSS_PRINT	2
+../Application/App/app_gnss.c:231:5:GNSS_PUTC	2

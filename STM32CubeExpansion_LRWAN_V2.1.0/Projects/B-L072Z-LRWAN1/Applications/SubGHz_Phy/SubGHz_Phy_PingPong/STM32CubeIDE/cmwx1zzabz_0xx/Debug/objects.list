@@ -1,3 +1,4 @@
+"./Application/App/app_gnss.o"
 "./Application/App/app_subghz_phy.o"
 "./Application/App/subghz_phy_app.o"
 "./Application/Core/dma.o"

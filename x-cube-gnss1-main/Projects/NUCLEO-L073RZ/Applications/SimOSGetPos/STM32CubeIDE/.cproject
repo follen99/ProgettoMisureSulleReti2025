@@ -3,7 +3,18 @@
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1515903572">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.debug.1515903572" moduleId="org.eclipse.cdt.core.settings" name="Debug">
-				<externalSettings/>
+				<externalSettings>
+					<externalSetting>
+						<entry flags="RESOLVED" kind="includePath" name="../../../../../Drivers/BSP/GNSS1A1"/>
+						<entry flags="RESOLVED" kind="includePath" name="../../../../../Drivers/BSP/Components/teseo_liv3f"/>
+						<entry flags="RESOLVED" kind="includePath" name="../../../../../Middlewares/ST/lib_gnss/LibNMEA/Inc"/>
+						<entry flags="RESOLVED" kind="includePath" name="../../../../../Middlewares/ST/lib_gnss/LibGNSS/Inc"/>
+						<entry flags="RESOLVED" kind="includePath" name="../../../../../Drivers/CMSIS/Include"/>
+						<entry flags="RESOLVED" kind="includePath" name="../../../../../Drivers/CMSIS/Device/ST/STM32L0xx/Include"/>
+						<entry flags="RESOLVED" kind="includePath" name="../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy"/>
+						<entry flags="RESOLVED" kind="includePath" name="../../../../../Drivers/STM32L0xx_HAL_Driver/Inc"/>
+					</externalSetting>
+				</externalSettings>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -22,7 +33,7 @@
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.target_coreid.1956195014" name="Core" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.target_coreid" useByScannerDiscovery="false" value="0" valueType="string"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.target_board.1340449683" name="Board" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.target_board" useByScannerDiscovery="false" value="NUCLEO-L073RZ" valueType="string"/>
 							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.defaults.158610806" name="Defaults" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.defaults" useByScannerDiscovery="false" value="com.st.stm32cube.ide.common.services.build.inputs.revA.1.0.5 || Debug || true || Executable || com.st.stm32cube.ide.mcu.gnu.managedbuild.option.toolchain.value.workspace || NUCLEO-L073RZ || 0 || 0 || arm-none-eabi- || ${gnu_tools_for_stm32_compiler_path} || ../../../../../../Drivers/BSP/GNSS1A1 | ../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/Legacy | ../../../../../../Drivers/BSP/Components/teseo_liv3f | ../../../../../../Middlewares/ST/lib_gnss/LibGNSS/Inc | ../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc | ../../../../../../Drivers/CMSIS/Device/ST/STM32L0xx/Include | ../../../../../../Drivers/CMSIS/Include | ../../Inc | ../../../../../../Middlewares/ST/lib_gnss/LibNMEA/Inc ||  ||  || USE_HAL_DRIVER | STM32L073xx ||  ||  ||  ||  || ${workspace_loc:/${ProjName}/STM32L073RZTX_FLASH.ld} || true || NonSecure ||  || secure_nsclib.o ||  || None || " valueType="string"/>
-							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.nanoprintffloat.2100919910" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.nanoprintffloat" value="true" valueType="boolean"/>
+							<option id="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.nanoprintffloat.2100919910" name="Use float with printf from newlib-nano (-u _printf_float)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.option.nanoprintffloat" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.targetplatform.486890305" isAbstract="false" osList="all" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.targetplatform"/>
 							<builder buildPath="${workspace_loc:/SimOSGetPos}/Debug" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.builder.344390536" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.builder"/>
 							<tool id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.assembler.465549273" name="MCU GCC Assembler" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.assembler">
@@ -50,6 +61,7 @@
 									<listOptionValue builtIn="false" value="../../../../../../Middlewares/ST/lib_gnss/LibNMEA/Inc"/>
 									<listOptionValue builtIn="false" value="../../../../../../Drivers/BSP/Components/teseo_liv3f"/>
 									<listOptionValue builtIn="false" value="../../../../../../Drivers/BSP/GNSS1A1"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\giuli\Documents\MAGISTRALE-git\ProgettoMisureSulleReti2025\STM32CubeExpansion_LRWAN_V2.1.0\Drivers\BSP\GNSS1A1&quot;"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.2142828176" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>

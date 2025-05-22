@@ -34,7 +34,8 @@ Application/Core/main.o: \
  ../../../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_tim_ex.h \
  ../../../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart.h \
  ../../../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart_ex.h \
- ../../../SubGHz_Phy/App/app_subghz_phy.h
+ ../../../SubGHz_Phy/App/app_subghz_phy.h \
+ C:/Users/giuli/Documents/MAGISTRALE-git/ProgettoMisureSulleReti2025/x-cube-gnss1-main/Projects/NUCLEO-L073RZ/Applications/SimOSGetPos/Inc/app_gnss.h
 ../../../Core/Inc/main.h:
 ../../../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal.h:
 ../../../Core/Inc/stm32l0xx_hal_conf.h:
@@ -70,3 +71,4 @@ Application/Core/main.o: \
 ../../../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart.h:
 ../../../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart_ex.h:
 ../../../SubGHz_Phy/App/app_subghz_phy.h:
+C:/Users/giuli/Documents/MAGISTRALE-git/ProgettoMisureSulleReti2025/x-cube-gnss1-main/Projects/NUCLEO-L073RZ/Applications/SimOSGetPos/Inc/app_gnss.h:

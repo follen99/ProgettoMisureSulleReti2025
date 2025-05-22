@@ -10,7 +10,6 @@ Middlewares/SubGHz_Phy/sx1276.o: \
  ../../../../../../../../Drivers/CMSIS/Include/cmsis_gcc.h \
  ../../../../../../../../Drivers/CMSIS/Include/mpu_armv7.h \
  ../../../../../../../../Drivers/CMSIS/Device/ST/STM32L0xx/Include/system_stm32l0xx.h \
- ../../../Core/Inc/main.h \
  ../../../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal.h \
  ../../../Core/Inc/stm32l0xx_hal_conf.h \
  ../../../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rcc.h \
@@ -36,6 +35,7 @@ Middlewares/SubGHz_Phy/sx1276.o: \
  ../../../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_tim_ex.h \
  ../../../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart.h \
  ../../../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart_ex.h \
+ ../../../Core/Inc/main.h \
  ../../../../../../../../Drivers/BSP/B-L072Z-LRWAN1/b-l072z-lrwan1.h \
  ../../../SubGHz_Phy/Target/b_l072z_lrwan1_bus.h \
  ../../../SubGHz_Phy/Target/timer.h \
@@ -67,7 +67,6 @@ Middlewares/SubGHz_Phy/sx1276.o: \
 ../../../../../../../../Drivers/CMSIS/Include/cmsis_gcc.h:
 ../../../../../../../../Drivers/CMSIS/Include/mpu_armv7.h:
 ../../../../../../../../Drivers/CMSIS/Device/ST/STM32L0xx/Include/system_stm32l0xx.h:
-../../../Core/Inc/main.h:
 ../../../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal.h:
 ../../../Core/Inc/stm32l0xx_hal_conf.h:
 ../../../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rcc.h:
@@ -93,6 +92,7 @@ Middlewares/SubGHz_Phy/sx1276.o: \
 ../../../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_tim_ex.h:
 ../../../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart.h:
 ../../../../../../../../Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_uart_ex.h:
+../../../Core/Inc/main.h:
 ../../../../../../../../Drivers/BSP/B-L072Z-LRWAN1/b-l072z-lrwan1.h:
 ../../../SubGHz_Phy/Target/b_l072z_lrwan1_bus.h:
 ../../../SubGHz_Phy/Target/timer.h:
