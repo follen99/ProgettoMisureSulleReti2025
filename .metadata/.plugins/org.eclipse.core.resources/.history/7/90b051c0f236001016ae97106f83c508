@@ -1,0 +1,56 @@
+#include "gnss.h"
+#include "main.h"
+#include <string.h>
+
+extern UART_HandleTypeDef huart2; // Assumi che huart2 sia definito nel main o in stm32xx_hal_msp.c
+
+static char rxBuffer[GNSS_BUFFER_SIZE];
+static int rxIndex = 0;
+static char latestSentence[GNSS_BUFFER_SIZE];
+static volatile int newSentenceReady = 0;
+static uint8_t rxByte;
+
+void GNSS_UART_StartReceive_IT(void) {
+    HAL_UART_Receive_IT(&huart2, &rxByte, 1);
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+    if (huart->Instance == USART2) {
+        if (rxByte == '\n') {
+            rxBuffer[rxIndex] = '\0';
+            // Copia frase completa in latestSentence
+            strncpy(latestSentence, rxBuffer, GNSS_BUFFER_SIZE);
+            latestSentence[GNSS_BUFFER_SIZE - 1] = '\0';
+            newSentenceReady = 1;
+            rxIndex = 0;
+        } else {
+            if (rxIndex < GNSS_BUFFER_SIZE - 1) {
+                rxBuffer[rxIndex++] = rxByte;
+            } else {
+                rxIndex = 0; // overflow
+            }
+        }
+        // Riattiva interrupt
+        HAL_UART_Receive_IT(&huart2, &rxByte, 1);
+    }
+}
+
+void GNSS_Init(void) {
+    // Assumi che MX_USART2_UART_Init() sia chiamata prima in main.c o qui
+    GNSS_UART_StartReceive_IT();
+}
+
+int GNSS_GetPosition(char *buffer, int max_len) {
+    if (!newSentenceReady) {
+        return -1; // nessuna nuova frase disponibile
+    }
+    // Copia la frase letta nel buffer passato
+    int len = strlen(latestSentence);
+    if (len + 1 > max_len) {
+        return -1; // buffer troppo piccolo
+    }
+    strncpy(buffer, latestSentence, max_len);
+    buffer[max_len - 1] = '\0';
+    newSentenceReady = 0;
+    return 0; // successo
+}

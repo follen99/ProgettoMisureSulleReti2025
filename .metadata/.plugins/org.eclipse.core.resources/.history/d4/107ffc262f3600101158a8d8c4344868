@@ -1,0 +1,18 @@
+#include "gnss.h"
+#include <string.h>  // per strcpy ecc.
+
+void GNSS_Init(void) {
+    // Inizializzazione reale o simulata del modulo GNSS
+    // Puoi mettere codice reale o lasciare vuoto se stai facendo test
+}
+
+int GNSS_GetPosition(char *buffer, int max_len) {
+    // Simulazione di posizione GPS
+    const char *pos = "Lat:45.123456, Lon:9.654321";
+
+    if (strlen(pos) + 1 > (unsigned)max_len) {
+        return -1;  // buffer troppo piccolo
+    }
+    strcpy(buffer, pos);
+    return 0;  // successo
+}
