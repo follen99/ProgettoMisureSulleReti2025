@@ -238,11 +238,12 @@ int32_t BSP_SPI1_RegisterMspCallbacks(BSP_SPI_Cb_t *Callbacks)
   * @brief  Return system tick in ms
   * @retval Current HAL time base time stamp
   */
+/*
 int32_t BSP_GetTick(void)
 {
   return HAL_GetTick();
 }
-
+*/
 /* SPI1 init function */
 
 __weak HAL_StatusTypeDef MX_SPI1_Init(SPI_HandleTypeDef *hspi)

@@ -42,7 +42,7 @@
 #include "stm32_timer.h"
 #include "stm32_seq.h"
 #include "utilities_def.h"
-#include "gnss.h"
+#include "app_gnss.h"
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
@@ -189,8 +189,7 @@ void SubghzApp_Init(void)
   RadioEvents.RxTimeout = OnRxTimeout;
   RadioEvents.RxError = OnRxError;
 
-  // Inizializzazione GNSS
-  GNSS_Init();
+  MX_GNSS_Init();
 
   Radio.Init(&RadioEvents);
 
