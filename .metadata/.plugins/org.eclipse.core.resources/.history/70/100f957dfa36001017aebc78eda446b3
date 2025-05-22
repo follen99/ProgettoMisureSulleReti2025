@@ -113,6 +113,7 @@ static UTIL_TIMER_Object_t timerLed;
 /* device state. Master: true, Slave: false*/
 bool isMaster = true;
 static int MASTER = 1;
+static boolean GNSS_Position_Valid = true;
 /* random delay to make sure 2 devices will sync*/
 /* the closest the random delays are, the longer it will
    take for the devices to sync when started simultaneously*/
@@ -379,6 +380,11 @@ static void OnRxError(void)
 
 
 bool get_gps_position(char *buffer, int buffer_len){
+    if (!GNSS_Position_Valid)
+    {
+        return false;
+    }
+
     // Stringhe di test fisse
     const char *test_lat = "45.123456";
     const char *test_lon = "9.654321";

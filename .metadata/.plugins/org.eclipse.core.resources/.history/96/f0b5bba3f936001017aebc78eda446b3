@@ -162,8 +162,6 @@ static void OnledEvent(void *context);
 static void PingPong_Process(void);
 static void Master(void);
 static void Slave(void);
-bool get_gps_position(char *buffer, int buffer_len);
-
 /* USER CODE END PFP */
 
 /* Exported functions ---------------------------------------------------------*/
@@ -376,19 +374,6 @@ static void OnRxError(void)
 }
 
 /* USER CODE BEGIN PrFD */
-
-
-bool get_gps_position(char *buffer, int buffer_len){
-    // Stringhe di test fisse
-    const char *test_lat = "45.123456";
-    const char *test_lon = "9.654321";
-
-    // Format: LAT:45.123456,LON:9.654321
-    int written = snprintf(buffer, buffer_len, "LAT:%s,LON:%s", test_lat, test_lon);
-
-    // Se scritto con successo e non troncato
-    return (written > 0 && written < buffer_len);
-}
 
 static void Master(void)
 {

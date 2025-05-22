@@ -379,12 +379,13 @@ static void OnRxError(void)
 
 
 bool get_gps_position(char *buffer, int buffer_len){
-    // Stringhe di test fisse
-    const char *test_lat = "45.123456";
-    const char *test_lon = "9.654321";
+    if (!GNSS_Position_Valid)
+    {
+        return false;
+    }
 
-    // Format: LAT:45.123456,LON:9.654321
-    int written = snprintf(buffer, buffer_len, "LAT:%s,LON:%s", test_lat, test_lon);
+    // Format: LAT:45.1234,LON:9.5678
+    int written = snprintf(buffer, buffer_len, "LAT:%.6f,LON:%.6f", GNSS_Latitude, GNSS_Longitude); // @suppress("Float formatting support")
 
     // Se scritto con successo e non troncato
     return (written > 0 && written < buffer_len);

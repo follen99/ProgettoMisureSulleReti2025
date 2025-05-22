@@ -379,6 +379,11 @@ static void OnRxError(void)
 
 
 bool get_gps_position(char *buffer, int buffer_len){
+    if (!GNSS_Position_Valid)
+    {
+        return false;
+    }
+
     // Stringhe di test fisse
     const char *test_lat = "45.123456";
     const char *test_lon = "9.654321";
