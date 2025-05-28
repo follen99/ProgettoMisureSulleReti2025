@@ -20,6 +20,7 @@
   ******************************************************************************
   */
 
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __NUCLEO_L073RZ_BUS_H
 #define __NUCLEO_L073RZ_BUS_H
@@ -28,12 +29,12 @@
 extern "C" {
 #endif
 
+#include "stm32l0xx_hal_i2c.h"
+
 #ifndef USE_HAL_SPI_REGISTER_CALLBACKS
 #define USE_HAL_SPI_REGISTER_CALLBACKS 0U
 #endif
-#ifndef USE_HAL_I2C_REGISTER_CALLBACKS
-#define USE_HAL_I2C_REGISTER_CALLBACKS 0U
-#endif
+
 
 /* Needed for SPI_GetPrescaler */
 #define RADIO_SPI_BAUDRATE                  10000000U /* 16M Sigfox, 10M Lora */
@@ -78,15 +79,10 @@ typedef struct
   pI2C_CallbackTypeDef  pMspInitCb;
   pI2C_CallbackTypeDef  pMspDeInitCb;
 }BSP_I2C_Cb_t;
-#endif
-/*
-#if (USE_HAL_I2C_REGISTER_CALLBACKS == 1)
-typedef struct
-{
-  pI2C_CallbackTypeDef  pMspI2cInitCb;
-  pI2C_CallbackTypeDef  pMspI2cDeInitCb;
-} BSP_I2C_Cb_t;
-#endif /* (USE_HAL_I2C_REGISTER_CALLBACKS == 1) */
+#endif /* (USE_HAL_I2C_REGISTER_CALLBACKS == 1U) */
+
+extern I2C_HandleTypeDef hi2c1;
+
 #if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U)
 typedef struct
 {
@@ -95,8 +91,6 @@ typedef struct
 } BSP_SPI_Cb_t;
 #endif /* (USE_HAL_SPI_REGISTER_CALLBACKS == 1) */
 
-
-extern I2C_HandleTypeDef hi2c1;
 
 /* Includes ------------------------------------------------------------------*/
 #include <stdint.h>
@@ -120,6 +114,11 @@ int32_t BSP_SPI1_Recv(uint8_t *pData, uint16_t len);
 int32_t BSP_SPI1_SendRecv(uint8_t *pTxData, uint8_t *pRxData, uint16_t len);
 
 int32_t BSP_GetTick(void);
+
+#if (USE_HAL_I2C_REGISTER_CALLBACKS == 1U)
+int32_t BSP_I2C1_RegisterDefaultMspCallbacks (void);
+int32_t BSP_I2C1_RegisterMspCallbacks (BSP_I2C_Cb_t *Callbacks);
+#endif /* (USE_HAL_I2C_REGISTER_CALLBACKS == 1U) */
 
 #if (USE_HAL_SPI_REGISTER_CALLBACKS == 1)
 int32_t BSP_BUS_RegisterDefaultMspCallbacks(void);
