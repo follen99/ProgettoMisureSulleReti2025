@@ -42,6 +42,10 @@
 #include "stm32_timer.h"
 #include "stm32_seq.h"
 #include "utilities_def.h"
+#include "app_gnss.h"
+#include "gnss_data.h"
+#include "gnss_parser.h"
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
@@ -112,7 +116,7 @@ int8_t SnrValue = 0;
 static UTIL_TIMER_Object_t timerLed;
 /* device state. Master: true, Slave: false*/
 bool isMaster = true;
-static int MASTER = 0;
+static int MASTER = 1;
 /* random delay to make sure 2 devices will sync*/
 /* the closest the random delays are, the longer it will
    take for the devices to sync when started simultaneously*/
@@ -159,7 +163,7 @@ static void OnledEvent(void *context);
 /**
   * @brief PingPong state machine implementation
   */
-static void PingPong_Process(void);
+//static void PingPong_Process(void);
 static void Master(void);
 static void Slave(void);
 /* USER CODE END PFP */
@@ -180,6 +184,12 @@ void SubghzApp_Init(void)
   UTIL_TIMER_SetPeriod(&timerLed, LED_PERIOD_MS);
   UTIL_TIMER_Start(&timerLed);
   /* USER CODE END SubghzApp_Init_1 */
+
+  if (MASTER == 1) {
+      MX_GNSS_Init();
+      MX_GNSS_PreOSInit();
+      MX_GNSS_PostOSInit();
+  }
 
   /* Radio initialization */
   RadioEvents.TxDone = OnTxDone;
@@ -377,13 +387,15 @@ static void OnRxError(void)
 
 static void Master(void) {
     static bool gpsSent = false;
-
     Radio.Sleep();
+
+    // Ottieni i dati GNSS validi
+    GNSSParser_Data_t gnss_data = {0};
+    GNSS_DATA_GetValidInfo(&gnss_data);
 
     switch (State)
     {
         case TX:
-            // Dopo aver inviato "GPS", metti in ascolto
             APP_LOG(TS_ON, VLEVEL_L, "Master: waiting for ACK...\n\r");
             Radio.Rx(RX_TIMEOUT_VALUE);
             gpsSent = true;
@@ -394,7 +406,6 @@ static void Master(void) {
             {
                 if (strncmp((const char *)BufferRx, ACK, sizeof(ACK) - 1) == 0)
                 {
-                    // Ricevuto ACK corretto
                     UTIL_TIMER_Stop(&timerLed);
                     LED_Off(LED_RED2);
                     LED_Toggle(LED_RED1);
@@ -405,34 +416,47 @@ static void Master(void) {
                     APP_LOG(TS_ON, VLEVEL_L, "Master: Unexpected message.\n\r");
                 }
 
-                // Riparti con il prossimo ciclo di invio GPS
                 gpsSent = false;
                 HAL_Delay(Radio.GetWakeupTime() + RX_TIME_MARGIN + random_delay);
-                memcpy(BufferTx, GPS, sizeof(GPS) - 1);
-                APP_LOG(TS_ON, VLEVEL_L, "Master Tx start: sending GPS\n\r");
+
+                if (gnss_data.gpgga_data.valid == 1)
+                {
+                    snprintf((char *)BufferTx, PAYLOAD_LEN, "LAT=%.5f,LON=%.5f",
+                             gnss_data.gpgga_data.xyz.lat, gnss_data.gpgga_data.xyz.lon);
+                    APP_LOG(TS_ON, VLEVEL_L, "Master Tx: sending coordinates\n\r");
+                }
+                else
+                {
+                    snprintf((char *)BufferTx, PAYLOAD_LEN, "GPS_NO_FIX");
+                    APP_LOG(TS_ON, VLEVEL_L, "Master Tx: no GPS fix\n\r");
+                }
+
                 Radio.Send(BufferTx, PAYLOAD_LEN);
             }
             else
             {
-                // Nessun messaggio ricevuto o GPS non ancora inviato
                 APP_LOG(TS_ON, VLEVEL_L, "Master: Nothing to process in RX\n\r");
             }
             break;
 
         case RX_TIMEOUT:
         case RX_ERROR:
-            // Timeout o errore: ritenta invio GPS
+        case TX_TIMEOUT:
             gpsSent = false;
             HAL_Delay(Radio.GetWakeupTime() + RX_TIME_MARGIN + random_delay);
-            memcpy(BufferTx, GPS, sizeof(GPS) - 1);
-            APP_LOG(TS_ON, VLEVEL_L, "Master Tx retry: sending GPS\n\r");
-            Radio.Send(BufferTx, PAYLOAD_LEN);
-            break;
 
-        case TX_TIMEOUT:
-            APP_LOG(TS_ON, VLEVEL_L, "Master: TX timeout, retry\n\r");
-            gpsSent = false;
-            memcpy(BufferTx, GPS, sizeof(GPS) - 1);
+            if (gnss_data.gpgga_data.valid == 1)
+            {
+                snprintf((char *)BufferTx, PAYLOAD_LEN, "LAT=%.5f,LON=%.5f",
+                         gnss_data.gpgga_data.xyz.lat, gnss_data.gpgga_data.xyz.lon);
+                APP_LOG(TS_ON, VLEVEL_L, "Master retry: sending coordinates\n\r");
+            }
+            else
+            {
+                snprintf((char *)BufferTx, PAYLOAD_LEN, "GPS_NO_FIX");
+                APP_LOG(TS_ON, VLEVEL_L, "Master retry: no GPS fix\n\r");
+            }
+
             Radio.Send(BufferTx, PAYLOAD_LEN);
             break;
 
@@ -449,31 +473,36 @@ static void Slave(void) {
         case RX:
             if (RxBufferSize > 0)
             {
-                if (strncmp((const char *)BufferRx, GPS, sizeof(GPS) - 1) == 0)
+                // Controlla se è un messaggio GPS o un "GPS_NO_FIX"
+                if (strncmp((const char *)BufferRx, "LAT=", 4) == 0 ||
+                    strncmp((const char *)BufferRx, "GPS_NO_FIX", 10) == 0)
                 {
-                    // Ricevuto messaggio GPS dal master
+                    // Messaggio GPS ricevuto
                     UTIL_TIMER_Stop(&timerLed);
                     LED_Off(LED_RED1);
                     LED_Toggle(LED_RED2);
-                    APP_LOG(TS_ON, VLEVEL_L, "Slave: GPS received. Sending ACK...\n\r");
+                    APP_LOG(TS_ON, VLEVEL_L, "Slave: GPS data received: %s\n\r", BufferRx);
 
-                    // Aggiunta attesa prima dell'invio dell'ACK
-                    uint32_t ackDelay = 5000; // ritardo tra 200 e 299 ms
+                    // Qui puoi aggiungere codice per elaborare BufferRx, es:
+                    // parsing delle coordinate, salvataggio, ecc.
+
+                    // Attesa prima di inviare l'ACK
+                    uint32_t ackDelay = 200 + (rand() % 100); // 200-299 ms casuali
                     HAL_Delay(Radio.GetWakeupTime() + RX_TIME_MARGIN + ackDelay);
 
+                    // Invia ACK
                     memcpy(BufferTx, ACK, sizeof(ACK) - 1);
                     Radio.Send(BufferTx, PAYLOAD_LEN);
                 }
                 else
                 {
-                    // Ricevuto messaggio inatteso: ignora e rimetti in ascolto
-                    APP_LOG(TS_ON, VLEVEL_L, "Slave: Unexpected message. Listening again...\n\r");
+                    // Messaggio inatteso
+                    APP_LOG(TS_ON, VLEVEL_L, "Slave: Unexpected message: %s\n\r", BufferRx);
                     Radio.Rx(RX_TIMEOUT_VALUE);
                 }
             }
             else
             {
-                // Nessun dato ricevuto, rimetti in ascolto
                 APP_LOG(TS_ON, VLEVEL_L, "Slave: Empty buffer. Listening again...\n\r");
                 Radio.Rx(RX_TIMEOUT_VALUE);
             }
@@ -487,13 +516,11 @@ static void Slave(void) {
 
         case RX_TIMEOUT:
         case RX_ERROR:
-            // Timeout o errore: continua ad ascoltare
             APP_LOG(TS_ON, VLEVEL_L, "Slave: Timeout or error. Listening again...\n\r");
             Radio.Rx(RX_TIMEOUT_VALUE);
             break;
 
         case TX_TIMEOUT:
-            // Timeout nella trasmissione: ritenta ad ascoltare
             APP_LOG(TS_ON, VLEVEL_L, "Slave: TX timeout. Listening again...\n\r");
             Radio.Rx(RX_TIMEOUT_VALUE);
             break;
@@ -502,6 +529,7 @@ static void Slave(void) {
             break;
     }
 }
+
 
 
 

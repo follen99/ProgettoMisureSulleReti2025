@@ -1,4 +1,4 @@
-11:24:22 **** Clean-only build of configuration Debug for project GetPos ****
+16:45:44 **** Clean-only build of configuration Debug for project GetPos ****
 make -j20 clean 
 rm -rf ./Middlewares/lib_gnss/Data\ Exchange/lib_gnss/LibNMEA/NMEA_parser.cyclo ./Middlewares/lib_gnss/Data\ Exchange/lib_gnss/LibNMEA/NMEA_parser.d ./Middlewares/lib_gnss/Data\ Exchange/lib_gnss/LibNMEA/NMEA_parser.o ./Middlewares/lib_gnss/Data\ Exchange/lib_gnss/LibNMEA/NMEA_parser.su
 rm -rf ./Middlewares/lib_gnss/Data\ Exchange/lib_gnss/LibGNSS/gnss_data.cyclo ./Middlewares/lib_gnss/Data\ Exchange/lib_gnss/LibGNSS/gnss_data.d ./Middlewares/lib_gnss/Data\ Exchange/lib_gnss/LibGNSS/gnss_data.o ./Middlewares/lib_gnss/Data\ Exchange/lib_gnss/LibGNSS/gnss_data.su ./Middlewares/lib_gnss/Data\ Exchange/lib_gnss/LibGNSS/gnss_parser.cyclo ./Middlewares/lib_gnss/Data\ Exchange/lib_gnss/LibGNSS/gnss_parser.d ./Middlewares/lib_gnss/Data\ Exchange/lib_gnss/LibGNSS/gnss_parser.o ./Middlewares/lib_gnss/Data\ Exchange/lib_gnss/LibGNSS/gnss_parser.su
@@ -14,5 +14,5 @@ rm -rf ./Application/User/Core/freertos.cyclo ./Application/User/Core/freertos.d
 rm -rf GetPos.elf GetPos.list GetPos.map default.size.stdout
  
 
-11:24:22 Build Finished. 0 errors, 0 warnings. (took 129ms)
+16:45:44 Build Finished. 0 errors, 0 warnings. (took 136ms)
 

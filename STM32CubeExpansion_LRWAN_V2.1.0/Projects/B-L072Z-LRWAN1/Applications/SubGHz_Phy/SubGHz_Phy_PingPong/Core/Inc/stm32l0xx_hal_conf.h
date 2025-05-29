@@ -171,11 +171,12 @@ in voltage and temperature.*/
 #define USE_HAL_SMARTCARD_REGISTER_CALLBACKS  0U
 #define USE_HAL_SMBUS_REGISTER_CALLBACKS      0U
 #define USE_HAL_SPI_REGISTER_CALLBACKS        0U
-#define USE_HAL_TIM_REGISTER_CALLBACKS        0U
+#define USE_HAL_TIM_REGISTER_CALLBACKS        1U
 #define USE_HAL_TSC_REGISTER_CALLBACKS        0U
-#define USE_HAL_UART_REGISTER_CALLBACKS       0U
+#define USE_HAL_UART_REGISTER_CALLBACKS       1U
 #define USE_HAL_USART_REGISTER_CALLBACKS      0U
 #define USE_HAL_WWDG_REGISTER_CALLBACKS       0U
+
 
 /* ################## SPI peripheral configuration ########################## */
 
@@ -183,7 +184,7 @@ in voltage and temperature.*/
  * Activated: CRC code is present inside driver
  * Deactivated: CRC code cleaned from driver
  */
-
+#define USE_FULL_ASSERT    			  1U
 #define USE_SPI_CRC                   1U
 
 /* Includes ------------------------------------------------------------------*/

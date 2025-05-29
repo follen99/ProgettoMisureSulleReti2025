@@ -18,6 +18,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "b_l072z_lrwan1_bus.h"
+#include "b_l072z_lrwan1_errno.h"
 //#include "stm32_bus_ex.h"
 
 /**

@@ -25,6 +25,7 @@
 #include "b_l072z_lrwan1_errno.h"
 #include "stm32l0xx_hal.h"
 #include "stm32l0xx_hal_i2c.h"
+#include "stm32l0xx_hal_conf.h"
 
 #define TIMEOUT_DURATION 1000
 /** @addtogroup BSP
@@ -58,6 +59,7 @@ static uint32_t IsSPI1MspCbValid = 0;
 static void SPI1_MspInit(SPI_HandleTypeDef *spiHandle);
 static void SPI1_MspDeInit(SPI_HandleTypeDef *spiHandle);
 static uint32_t SPI_GetPrescaler(uint32_t clock_src_hz, uint32_t baudrate_mbps);
+int32_t BSP_I2C1_RegisterDefaultMspCallbacks(void);
 
 /**
   * @}
@@ -669,49 +671,39 @@ int32_t BSP_I2C1_Recv(uint16_t DevAddr, uint8_t *pData, uint16_t Length)
   return ret;
 }
 
+
+/*
 #if (USE_HAL_I2C_REGISTER_CALLBACKS == 1U)
-/**
-  * @brief Register Default BSP I2C1 Bus Msp Callbacks
-  * @retval BSP status
-  */
+
+
 int32_t BSP_I2C1_RegisterDefaultMspCallbacks(void)
 {
-
   __HAL_I2C_RESET_HANDLE_STATE(&hi2c1);
 
-  /* Register MspInit Callback */
-  if (HAL_I2C_RegisterCallback(&hi2c1, HAL_I2C_MSPINIT_CB_ID, I2C1_MspInit)  != HAL_OK)
+  if (HAL_I2C_RegisterCallback(&hi2c1, HAL_I2C_MSPINIT_CB_ID, I2C1_MspInit) != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
 
-  /* Register MspDeInit Callback */
   if (HAL_I2C_RegisterCallback(&hi2c1, HAL_I2C_MSPDEINIT_CB_ID, I2C1_MspDeInit) != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
+
   IsI2C1MspCbValid = 1;
 
   return BSP_ERROR_NONE;
 }
 
-/**
-  * @brief BSP I2C1 Bus Msp Callback registering
-  * @param Callbacks     pointer to I2C1 MspInit/MspDeInit callback functions
-  * @retval BSP status
-  */
 int32_t BSP_I2C1_RegisterMspCallbacks(BSP_I2C_Cb_t *Callbacks)
 {
-  /* Prevent unused argument(s) compilation warning */
   __HAL_I2C_RESET_HANDLE_STATE(&hi2c1);
 
-  /* Register MspInit Callback */
-  if (HAL_I2C_RegisterCallback(&hi2c1, HAL_I2C_MSPINIT_CB_ID, Callbacks->pMspInitCb)  != HAL_OK)
+  if (HAL_I2C_RegisterCallback(&hi2c1, HAL_I2C_MSPINIT_CB_ID, Callbacks->pMspInitCb) != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
   }
 
-  /* Register MspDeInit Callback */
   if (HAL_I2C_RegisterCallback(&hi2c1, HAL_I2C_MSPDEINIT_CB_ID, Callbacks->pMspDeInitCb) != HAL_OK)
   {
     return BSP_ERROR_PERIPH_FAILURE;
@@ -721,7 +713,8 @@ int32_t BSP_I2C1_RegisterMspCallbacks(BSP_I2C_Cb_t *Callbacks)
 
   return BSP_ERROR_NONE;
 }
-#endif /* USE_HAL_I2C_REGISTER_CALLBACKS */
+
+#endif */ /* USE_HAL_I2C_REGISTER_CALLBACKS == 1U */
 
 /* I2C1 init function */
 
