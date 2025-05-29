@@ -1,0 +1,45 @@
+# STM32CubeIDE & Eclipse
+.project
+.cproject
+.settings/
+.loadpath
+
+# Build output
+build/
+Debug/
+Release/
+*.elf
+*.bin
+*.hex
+*.map
+*.list
+*.srec
+
+# Temporary files
+*.o
+*.d
+*.dep
+*.a
+*.su
+*.mod
+*.cmd
+
+# IDE metadata
+.idea/
+*.launch
+*.uvopt*
+*.uvproj*
+*.bak
+*.log
+*.swp
+
+# CubeMX-generated backup
+*.ioc_backup
+*.db
+
+# OS/Editor specific
+.DS_Store
+Thumbs.db
+.vscode/
+*.orig
+*.tmp

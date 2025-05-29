@@ -59,6 +59,8 @@
 #define HSI_VALUE    ((uint32_t)16000000U) /*!< Value of the Internal oscillator in Hz*/
 #endif /* HSI_VALUE */
 
+#define VECT_TAB_OFFSET         0x00000000U     /*!< Vector Table base offset field.
+
 
 /**
   * @}
@@ -79,10 +81,17 @@
 
 /*!< Uncomment the following line if you need to relocate your vector Table in
      Internal SRAM. */
-/* #define VECT_TAB_SRAM */
-#define VECT_TAB_OFFSET  0x00U /*!< Vector Table base offset field.
-                                   This value must be a multiple of 0x100. */
-/******************************************************************************/
+
+/* Note: Following vector table addresses must be defined in line with linker
+         configuration. */
+
+// from gnss
+/*!< Uncomment the following line if you need to relocate the vector table
+     anywhere in Flash or Sram, else the vector table is kept at the automatic
+     remap of boot address selected */
+/* #define USER_VECT_TAB_ADDRESS */
+
+
 /**
   * @}
   */
@@ -134,6 +143,13 @@ const uint8_t PLLMulTable[9] = {3U, 4U, 6U, 8U, 12U, 16U, 24U, 32U, 48U};
   */
 void SystemInit(void)
 {
+
+	// from gnss
+	  /* Configure the Vector Table location add offset address ------------------*/
+	#if defined (USER_VECT_TAB_ADDRESS)
+	  SCB->VTOR = VECT_TAB_BASE_ADDRESS | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM */
+	#endif /* USER_VECT_TAB_ADDRESS */
+
   /*!< Set MSION bit */
   RCC->CR |= (uint32_t)0x00000100U;
 

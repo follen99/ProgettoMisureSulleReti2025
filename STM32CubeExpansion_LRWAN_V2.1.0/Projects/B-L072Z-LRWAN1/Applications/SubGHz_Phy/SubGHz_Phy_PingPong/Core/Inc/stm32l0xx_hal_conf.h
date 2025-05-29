@@ -64,6 +64,41 @@ extern "C" {
 #define HAL_CORTEX_MODULE_ENABLED
 /* #define HAL_PCD_MODULE_ENABLED       */
 
+// -- from gnss
+#define HAL_MODULE_ENABLED
+  /*#define HAL_ADC_MODULE_ENABLED   */
+/*#define HAL_CRYP_MODULE_ENABLED   */
+/*#define HAL_COMP_MODULE_ENABLED   */
+/*#define HAL_CRC_MODULE_ENABLED   */
+/*#define HAL_CRYP_MODULE_ENABLED   */
+/*#define HAL_DAC_MODULE_ENABLED   */
+/*#define HAL_FIREWALL_MODULE_ENABLED   */
+/*#define HAL_I2S_MODULE_ENABLED   */
+/*#define HAL_IWDG_MODULE_ENABLED   */
+/*#define HAL_LCD_MODULE_ENABLED   */
+/*#define HAL_LPTIM_MODULE_ENABLED   */
+/*#define HAL_RNG_MODULE_ENABLED   */
+/*#define HAL_RTC_MODULE_ENABLED   */
+/*#define HAL_SPI_MODULE_ENABLED   */
+/*#define HAL_TIM_MODULE_ENABLED   */
+/*#define HAL_TSC_MODULE_ENABLED   */
+#define HAL_UART_MODULE_ENABLED
+/*#define HAL_USART_MODULE_ENABLED   */
+/*#define HAL_IRDA_MODULE_ENABLED   */
+/*#define HAL_SMARTCARD_MODULE_ENABLED   */
+/*#define HAL_SMBUS_MODULE_ENABLED   */
+/*#define HAL_WWDG_MODULE_ENABLED   */
+/*#define HAL_PCD_MODULE_ENABLED   */
+#define HAL_GPIO_MODULE_ENABLED
+
+
+#define HAL_DMA_MODULE_ENABLED
+#define HAL_I2C_MODULE_ENABLED
+#define HAL_RCC_MODULE_ENABLED
+
+
+
+
 /* ########################## Oscillator Values adaptation ####################*/
 /**
   * @brief Adjust the value of External High Speed oscillator (HSE) used in your application.
@@ -71,11 +106,19 @@ extern "C" {
   *        (when HSE is used as system clock source, directly or through the PLL).
   */
 #if !defined  (HSE_VALUE)
+
 #define HSE_VALUE    (8000000U)         /*!< Value of the External oscillator in Hz */
+// from gnss
+//   #define HSE_VALUE    ((uint32_t)8000000U) /*!< Value of the External oscillator in Hz */
+
+
+
 #endif /* HSE_VALUE */
 
 #if !defined  (HSE_STARTUP_TIMEOUT)
 #define HSE_STARTUP_TIMEOUT    (100U)   /*!< Time out for HSE start up, in ms */
+//   #define HSE_STARTUP_TIMEOUT    ((uint32_t)100U)   /*!< Time out for HSE start up, in ms */
+
 #endif /* HSE_STARTUP_TIMEOUT */
 
 /**
@@ -84,6 +127,8 @@ extern "C" {
   */
 #if !defined  (MSI_VALUE)
 #define MSI_VALUE    (2097152U)         /*!< Value of the Internal oscillator in Hz*/
+//   #define MSI_VALUE    ((uint32_t)2097000U) /*!< Value of the Internal oscillator in Hz*/
+
 #endif /* MSI_VALUE */
 
 /**
@@ -93,6 +138,8 @@ extern "C" {
   */
 #if !defined  (HSI_VALUE)
 #define HSI_VALUE    (16000000U)        /*!< Value of the Internal oscillator in Hz*/
+//   #define HSI_VALUE    ((uint32_t)16000000U) /*!< Value of the Internal oscillator in Hz*/
+
 #endif /* HSI_VALUE */
 
 /**
@@ -102,6 +149,8 @@ extern "C" {
 #define HSI48_VALUE (48000000U)           /*!< Value of the Internal High Speed oscillator for USB in Hz.
                                              The real value may vary depending on the variations
                                              in voltage and temperature.  */
+//#define HSI48_VALUE ((uint32_t)48000000U) /*!< Value of the Internal High Speed oscillator for USB in Hz.
+
 #endif /* HSI48_VALUE */
 
 /**
@@ -109,6 +158,8 @@ extern "C" {
   */
 #if !defined  (LSI_VALUE)
 #define LSI_VALUE  (37000U)                 /*!< LSI Typical Value in Hz*/
+//  #define LSI_VALUE  ((uint32_t)37000U)       /*!< LSI Typical Value in Hz*/
+
 #endif /* LSI_VALUE */                      /*!< Value of the Internal Low Speed oscillator in Hz
 The real value may vary depending on the variations
 in voltage and temperature.*/
@@ -118,6 +169,8 @@ in voltage and temperature.*/
   */
 #if !defined  (LSE_VALUE)
 #define LSE_VALUE    (32768U)             /*!< Value of the External oscillator in Hz*/
+//   #define LSE_VALUE    ((uint32_t)32768U) /*!< Value of the External oscillator in Hz*/
+
 #endif /* LSE_VALUE */
 
 /**
@@ -125,6 +178,8 @@ in voltage and temperature.*/
   */
 #if !defined  (LSE_STARTUP_TIMEOUT)
 #define LSE_STARTUP_TIMEOUT    (5000U)    /*!< Time out for LSE start up, in ms */
+//   #define LSE_STARTUP_TIMEOUT  ((uint32_t)5000U)   /*!< Time out for LSE start up, in ms */
+
 #endif /* LSE_STARTUP_TIMEOUT */
 
 /* Tip: To avoid modifying this file each time you need to use different HSE,
@@ -140,6 +195,14 @@ in voltage and temperature.*/
 #define  PREFETCH_ENABLE              1U
 #define  PREREAD_ENABLE               0U
 #define  BUFFER_CACHE_DISABLE         0U
+
+// in gnss è:
+//#define  VDD_VALUE                    ((uint32_t)3300U) /*!< Value of VDD in mv */
+//#define  TICK_INT_PRIORITY            ((uint32_t)0U)    /*!< tick interrupt priority */
+//#define  USE_RTOS                     0U
+//#define  PREFETCH_ENABLE              0U
+//#define  PREREAD_ENABLE               1U
+//#define  BUFFER_CACHE_DISABLE         0U
 
 /* ########################## Assert Selection ############################## */
 /**
