@@ -221,6 +221,7 @@ void EXTI0_1_IRQHandler(void)
 
 void EXTI2_3_IRQHandler(void)
 {
+	HAL_GPIO_EXTI_IRQHandler(KEY_BUTTON_PIN);
 #if (defined(SX1276MB1MAS) | defined(SX1276MB1LAS) | defined(SX1272MB2DAS))
   HAL_EXTI_IRQHandler(&H_EXTI_3);
 #endif

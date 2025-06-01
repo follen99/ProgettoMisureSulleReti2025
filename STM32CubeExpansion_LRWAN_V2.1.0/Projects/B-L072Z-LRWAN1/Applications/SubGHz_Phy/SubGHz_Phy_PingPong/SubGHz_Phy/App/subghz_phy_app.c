@@ -42,6 +42,7 @@
 #include "stm32_timer.h"
 #include "stm32_seq.h"
 #include "utilities_def.h"
+#include "b-l072z-lrwan1.h"
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
@@ -112,7 +113,8 @@ int8_t SnrValue = 0;
 static UTIL_TIMER_Object_t timerLed;
 /* device state. Master: true, Slave: false*/
 bool isMaster = true;
-static int MASTER = 0;
+static int MASTER = 1;
+static int buttonPressed = 0;
 /* random delay to make sure 2 devices will sync*/
 /* the closest the random delays are, the longer it will
    take for the devices to sync when started simultaneously*/
@@ -159,9 +161,10 @@ static void OnledEvent(void *context);
 /**
   * @brief PingPong state machine implementation
   */
-static void PingPong_Process(void);
+//static void PingPong_Process(void);
 static void Master(void);
 static void Slave(void);
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 /* USER CODE END PFP */
 
 /* Exported functions ---------------------------------------------------------*/
@@ -180,6 +183,10 @@ void SubghzApp_Init(void)
   UTIL_TIMER_SetPeriod(&timerLed, LED_PERIOD_MS);
   UTIL_TIMER_Start(&timerLed);
   /* USER CODE END SubghzApp_Init_1 */
+
+  BSP_PB_Init(BUTTON_USER, BUTTON_MODE_EXTI);
+
+  /* USER CODE BEGIN SubghzApp_Init_2 */
 
   /* Radio initialization */
   RadioEvents.TxDone = OnTxDone;
@@ -262,6 +269,16 @@ void SubghzApp_Init(void)
 /* USER CODE END EF */
 
 /* Private functions ---------------------------------------------------------*/
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if (GPIO_Pin == KEY_BUTTON_PIN)
+  {
+    BSP_LED_Toggle(LED2);
+    buttonPressed = true;               // Indico che il bottone è stato premuto
+    UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_SubGHz_Phy_App_Master, CFG_SEQ_Prio_0);
+  }
+}
 
 static void OnTxDone(void)
 {
@@ -383,10 +400,10 @@ static void Master(void) {
     switch (State)
     {
         case TX:
-            // Dopo aver inviato "GPS", metti in ascolto
             APP_LOG(TS_ON, VLEVEL_L, "Master: waiting for ACK...\n\r");
             Radio.Rx(RX_TIMEOUT_VALUE);
             gpsSent = true;
+            buttonPressed = false;   // Resetto il flag, perché ho già mandato il pacchetto
             break;
 
         case RX:
@@ -394,7 +411,6 @@ static void Master(void) {
             {
                 if (strncmp((const char *)BufferRx, ACK, sizeof(ACK) - 1) == 0)
                 {
-                    // Ricevuto ACK corretto
                     UTIL_TIMER_Stop(&timerLed);
                     LED_Off(LED_RED2);
                     LED_Toggle(LED_RED1);
@@ -404,42 +420,39 @@ static void Master(void) {
                 {
                     APP_LOG(TS_ON, VLEVEL_L, "Master: Unexpected message.\n\r");
                 }
-
-                // Riparti con il prossimo ciclo di invio GPS
                 gpsSent = false;
-                HAL_Delay(Radio.GetWakeupTime() + RX_TIME_MARGIN + random_delay);
-                memcpy(BufferTx, GPS, sizeof(GPS) - 1);
-                APP_LOG(TS_ON, VLEVEL_L, "Master Tx start: sending GPS\n\r");
-                Radio.Send(BufferTx, PAYLOAD_LEN);
             }
             else
             {
-                // Nessun messaggio ricevuto o GPS non ancora inviato
                 APP_LOG(TS_ON, VLEVEL_L, "Master: Nothing to process in RX\n\r");
             }
             break;
 
         case RX_TIMEOUT:
         case RX_ERROR:
-            // Timeout o errore: ritenta invio GPS
+            APP_LOG(TS_ON, VLEVEL_L, "Master: Timeout/Error. Listening again...\n\r");
+            Radio.Rx(RX_TIMEOUT_VALUE);
             gpsSent = false;
-            HAL_Delay(Radio.GetWakeupTime() + RX_TIME_MARGIN + random_delay);
-            memcpy(BufferTx, GPS, sizeof(GPS) - 1);
-            APP_LOG(TS_ON, VLEVEL_L, "Master Tx retry: sending GPS\n\r");
-            Radio.Send(BufferTx, PAYLOAD_LEN);
             break;
 
         case TX_TIMEOUT:
             APP_LOG(TS_ON, VLEVEL_L, "Master: TX timeout, retry\n\r");
             gpsSent = false;
-            memcpy(BufferTx, GPS, sizeof(GPS) - 1);
-            Radio.Send(BufferTx, PAYLOAD_LEN);
             break;
 
         default:
             break;
     }
+
+    // SOLO QUI mando il pacchetto se il bottone è premuto e non è già in attesa di ACK
+    if(buttonPressed && !gpsSent)
+    {
+        memcpy(BufferTx, GPS, sizeof(GPS) - 1);
+        APP_LOG(TS_ON, VLEVEL_L, "Master Tx start: sending GPS\n\r");
+        Radio.Send(BufferTx, PAYLOAD_LEN);
+    }
 }
+
 
 static void Slave(void) {
     Radio.Sleep();

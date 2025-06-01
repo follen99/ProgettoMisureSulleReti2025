@@ -1,4 +1,4 @@
-11:05:39 **** Clean-only build of configuration Debug for project cmwx1zzabz_0xx ****
+17:28:14 **** Clean-only build of configuration Debug for project cmwx1zzabz_0xx ****
 make clean 
 rm -rf ./Utilities/stm32_adv_trace.cyclo ./Utilities/stm32_adv_trace.d ./Utilities/stm32_adv_trace.o ./Utilities/stm32_adv_trace.su ./Utilities/stm32_lpm.cyclo ./Utilities/stm32_lpm.d ./Utilities/stm32_lpm.o ./Utilities/stm32_lpm.su ./Utilities/stm32_mem.cyclo ./Utilities/stm32_mem.d ./Utilities/stm32_mem.o ./Utilities/stm32_mem.su ./Utilities/stm32_seq.cyclo ./Utilities/stm32_seq.d ./Utilities/stm32_seq.o ./Utilities/stm32_seq.su ./Utilities/stm32_systime.cyclo ./Utilities/stm32_systime.d ./Utilities/stm32_systime.o ./Utilities/stm32_systime.su ./Utilities/stm32_timer.cyclo ./Utilities/stm32_timer.d ./Utilities/stm32_timer.o ./Utilities/stm32_timer.su ./Utilities/stm32_tiny_vsnprintf.cyclo ./Utilities/stm32_tiny_vsnprintf.d ./Utilities/stm32_tiny_vsnprintf.o ./Utilities/stm32_tiny_vsnprintf.su
 rm -rf ./Middlewares/SubGHz_Phy/sx1276.cyclo ./Middlewares/SubGHz_Phy/sx1276.d ./Middlewares/SubGHz_Phy/sx1276.o ./Middlewares/SubGHz_Phy/sx1276.su
@@ -13,5 +13,5 @@ rm -rf ./Application/App/app_subghz_phy.cyclo ./Application/App/app_subghz_phy.d
 rm -rf cmwx1zzabz_0xx.bin cmwx1zzabz_0xx.elf cmwx1zzabz_0xx.list cmwx1zzabz_0xx.map default.size.stdout
  
 
-11:05:40 Build Finished. 0 errors, 0 warnings. (took 284ms)
+17:28:14 Build Finished. 0 errors, 0 warnings. (took 238ms)
 
