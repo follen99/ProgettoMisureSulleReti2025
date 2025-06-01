@@ -115,8 +115,8 @@ int8_t SnrValue = 0;
 /* Led Timers objects*/
 static UTIL_TIMER_Object_t timerLed;
 /* device state. Master: true, Slave: false*/
-bool isMaster = true;
-static int MASTER = 1;
+//bool isMaster = true;
+static int MASTER = 0;
 /* random delay to make sure 2 devices will sync*/
 /* the closest the random delays are, the longer it will
    take for the devices to sync when started simultaneously*/
@@ -187,8 +187,6 @@ void SubghzApp_Init(void)
 
   if (MASTER == 1) {
       MX_GNSS_Init();
-      MX_GNSS_PreOSInit();
-      MX_GNSS_PostOSInit();
   }
 
   /* Radio initialization */
@@ -386,7 +384,8 @@ static void OnRxError(void)
 /* USER CODE BEGIN PrFD */
 
 static void Master(void) {
-    static bool gpsSent = false;
+	APP_LOG(TS_ON, VLEVEL_L, "START");
+    static int gpsSent = 0;
     Radio.Sleep();
 
     // Ottieni i dati GNSS validi
@@ -398,11 +397,11 @@ static void Master(void) {
         case TX:
             APP_LOG(TS_ON, VLEVEL_L, "Master: waiting for ACK...\n\r");
             Radio.Rx(RX_TIMEOUT_VALUE);
-            gpsSent = true;
+            gpsSent = 1;
             break;
 
         case RX:
-            if (gpsSent && RxBufferSize > 0)
+            if (gpsSent == 1 && RxBufferSize > 0)
             {
                 if (strncmp((const char *)BufferRx, ACK, sizeof(ACK) - 1) == 0)
                 {
@@ -416,7 +415,7 @@ static void Master(void) {
                     APP_LOG(TS_ON, VLEVEL_L, "Master: Unexpected message.\n\r");
                 }
 
-                gpsSent = false;
+                gpsSent = 0;
                 HAL_Delay(Radio.GetWakeupTime() + RX_TIME_MARGIN + random_delay);
 
                 if (gnss_data.gpgga_data.valid == 1)
@@ -442,7 +441,7 @@ static void Master(void) {
         case RX_TIMEOUT:
         case RX_ERROR:
         case TX_TIMEOUT:
-            gpsSent = false;
+            gpsSent = 0;
             HAL_Delay(Radio.GetWakeupTime() + RX_TIME_MARGIN + random_delay);
 
             if (gnss_data.gpgga_data.valid == 1)

@@ -28,8 +28,7 @@ extern "C" {
 
 /* Exported Functions --------------------------------------------------------*/
 void MX_GNSS_Init(void);
-void MX_GNSS_PreOSInit(void);
-void MX_GNSS_PostOSInit(void);
+void MX_GNSS_Process(void);
 
 #ifdef __cplusplus
 }

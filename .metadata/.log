@@ -131,3 +131,6 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64
 
 !ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-06-01 16:20:42.139
 !MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.cdt.core 1 0 2025-06-01 17:41:24.445
+!MESSAGE Indexed 'SimOSGetPos' (37 sources, 112 headers) in 0.726 sec: 7,682 declarations; 39,860 references; 0 unresolved inclusions; 2 syntax errors; 2 unresolved names (0.0042%)

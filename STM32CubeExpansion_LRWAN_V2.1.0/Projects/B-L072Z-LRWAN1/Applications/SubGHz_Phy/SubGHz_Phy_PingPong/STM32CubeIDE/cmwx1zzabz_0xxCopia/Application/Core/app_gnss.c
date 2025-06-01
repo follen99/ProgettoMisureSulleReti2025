@@ -2,45 +2,180 @@
 #include "gnss_data.h"     // dove è dichiarato GNSS_DATA_GetValidInfo e GNSSParser_Data_t
 #include "gnss_parser.h"   // eventuale supporto al parsing
 #include <stdio.h>
+#include "gnss1a1_gnss.h"
 
 // Variabile statica per memorizzare i dati GNSS attuali (puoi gestirla diversamente)
-static GNSSParser_Data_t currentGnssData = {0};
+static GNSSParser_Data_t GNSSParser_Data;
 
-void MX_GNSS_PreOSInit(void)
-{
-    // Inizializzazione preliminare hardware GNSS o variabili globali
-    // Esempio: reset dati
-    currentGnssData.gpgga_data.valid = 0;
-}
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+static void MX_SimOSGetPos_Process(void);
+
+#if (configUSE_FEATURE == 1)
+static void AppCfgMsgList(int lowMask, int highMask);
+static void AppGeofenceCfg(char *command);
+static void AppEnFeature(char *command);
+#endif /* configUSE_FEATURE */
+
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
 
 void MX_GNSS_Init(void)
 {
-    // Inizializzazione periferiche GNSS (UART, I2C, SPI etc.)
-    // Da implementare a seconda del modulo GNSS usato
+  /* USER CODE BEGIN GNSS_Init_PreTreatment */
+
+  /* USER CODE END GNSS_Init_PreTreatment */
+
+  /* Initialize the peripherals and the teseo device */
+
+
+  /* USER CODE BEGIN GNSS_Init_PostTreatment */
+
+  /* USER CODE END GNSS_Init_PostTreatment */
 }
 
-void MX_GNSS_PostOSInit(void)
+void MX_GNSS_Process(void)
 {
-    // Qualsiasi inizializzazione da fare dopo che OS o scheduler è attivo
-    // Es. avvia task GNSS, timer, interrupt ecc.
+  /* USER CODE BEGIN GNSS_Process_PreTreatment */
+
+  /* USER CODE END GNSS_Process_PreTreatment */
+  MX_SimOSGetPos_Process();
+
+  /* USER CODE BEGIN GNSS_Process_PostTreatment */
+
+  /* USER CODE END GNSS_Process_PostTreatment */
 }
 
-// Esempio funzione per aggiornare dati GNSS da buffer NMEA
-void GNSS_ProcessIncomingData(const char *nmeaSentence)
+/* TeseoConsumerTask function */
+static void MX_SimOSGetPos_Process(void)
 {
-    // qui chiameresti il parser vero per aggiornare currentGnssData
-    // es. GNSS_Parser_ParseNMEA(&currentGnssData, nmeaSentence);
-    // per ora simuliamo:
-    if (nmeaSentence != NULL && strstr(nmeaSentence, "$GPGGA") != NULL) {
-        currentGnssData.gpgga_data.valid = 1;
-        currentGnssData.gpgga_data.xyz.lat = 45.12345;  // esempio lat
-        currentGnssData.gpgga_data.xyz.lon = 7.12345;   // esempio lon
+  GNSSParser_Status_t status, check;
+  const GNSS1A1_GNSS_Msg_t *gnssMsg;
+#if (configUSE_FEATURE == 1)
+  static int config_done = 0;
+#endif
+
+  GNSS1A1_GNSS_Init(GNSS1A1_TESEO_LIV3F);
+
+  GNSS_PARSER_Init(&GNSSParser_Data);
+
+  for(;;)
+  {
+#if (USE_I2C == 1)
+    GNSS1A1_GNSS_BackgroundProcess(GNSS1A1_TESEO_LIV3F);
+#endif /* USE_I2C */
+
+#if (configUSE_FEATURE == 1)
+    /* See CDB-ID 201 - This LOW_BITS Mask enables the following messages:
+     * 0x1 $GPGNS Message
+     * 0x2 $GPGGA Message
+     * 0x4 $GPGSA Message
+     * 0x8 $GPGST Message
+     * 0x40 $GPRMC Message
+     * 0x80000 $GPGSV Message
+     * 0x100000 $GPGLL Message
+     */
+    if(!config_done)
+    {
+      int lowMask = 0x18004F;
+      int highMask = GEOFENCE;
+      PRINT_OUT("\n\rConfigure Message List\n\r");
+      AppCfgMsgList(lowMask, highMask);
+      HAL_Delay(1000);  /*Allows to catch the reply from Teseo */
+
+      PRINT_OUT("\n\rEnable Geofence\r");
+      AppEnFeature("GEOFENCE,1");
+      HAL_Delay(500);  /* Allows to catch the reply from Teseo */
+
+      PRINT_OUT("\n\rConfigure Geofence Circle\n\r");
+      AppGeofenceCfg("Geofence-Lecce");
+
+      config_done = 1;
     }
+#endif /* configUSE_FEATURE */
+
+    gnssMsg = GNSS1A1_GNSS_GetMessage(GNSS1A1_TESEO_LIV3F);
+
+    if(gnssMsg == NULL)
+    {
+      continue;
+    }
+
+    check = GNSS_PARSER_CheckSanity((uint8_t *)gnssMsg->buf, gnssMsg->len);
+
+    if(check != GNSS_PARSER_ERROR)
+    {
+      for(int m = 0; m < NMEA_MSGS_NUM; m++)
+      {
+        status = GNSS_PARSER_ParseMsg(&GNSSParser_Data, (eNMEAMsg)m, (uint8_t *)gnssMsg->buf);
+
+        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == GPGGA))
+        {
+          GNSS_DATA_GetValidInfo(&GNSSParser_Data);
+        }
+#if (configUSE_FEATURE == 1)
+        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == PSTMGEOFENCE))
+        {
+          GNSS_DATA_GetGeofenceInfo(&GNSSParser_Data);
+        }
+        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == PSTMSGL))
+        {
+          GNSS_DATA_GetMsglistAck(&GNSSParser_Data);
+        }
+        if((status != GNSS_PARSER_ERROR) && ((eNMEAMsg)m == PSTMSAVEPAR))
+        {
+          GNSS_DATA_GetGNSSAck(&GNSSParser_Data);
+        }
+#endif /* configUSE_FEATURE */
+      }
+    }
+
+    GNSS1A1_GNSS_ReleaseMessage(GNSS1A1_TESEO_LIV3F, gnssMsg);
+  }
 }
 
-// Funzione che permette di copiare lo stato GNSS aggiornato
-void GNSS_DATA_GetValidInfo(GNSSParser_Data_t *data)
+#if (configUSE_FEATURE == 1)
+/* CfgMessageList */
+static void AppCfgMsgList(int lowMask, int highMask)
 {
-    if (data == NULL) return;
-    *data = currentGnssData;
+  GNSS_DATA_CfgMessageList(lowMask, highMask);
+}
+
+static void AppEnFeature(char *command)
+{
+  if(strcmp(command, "GEOFENCE,1") == 0)
+  {
+    GNSS_DATA_EnableGeofence(1);
+  }
+  if(strcmp(command, "GEOFENCE,0") == 0)
+  {
+    GNSS_DATA_EnableGeofence(0);
+  }
+}
+
+static void AppGeofenceCfg(char *command)
+{
+  if(strcmp(command, "Geofence-Lecce") == 0)
+  {
+    GNSS_DATA_ConfigGeofence(&Geofence_STLecce);
+  }
+  if(strcmp(command, "Geofence-Catania") == 0)
+  {
+    GNSS_DATA_ConfigGeofence(&Geofence_Catania);
+  }
+}
+#endif /* configUSE_FEATURE */
+
+int GNSS_PRINT(char *pBuffer)
+{
+
+}
+
+int GNSS_PUTC(char pChar)
+{
+
 }

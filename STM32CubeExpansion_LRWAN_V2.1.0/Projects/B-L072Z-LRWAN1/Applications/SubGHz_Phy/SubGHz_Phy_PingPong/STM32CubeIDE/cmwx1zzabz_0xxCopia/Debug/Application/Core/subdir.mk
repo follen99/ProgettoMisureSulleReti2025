@@ -5,9 +5,12 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Application/Core/NMEA_parser.c \
 ../Application/Core/app_gnss.c \
 D:/Git/ProgettoMisureSulleReti2025/STM32CubeExpansion_LRWAN_V2.1.0/Projects/B-L072Z-LRWAN1/Applications/SubGHz_Phy/SubGHz_Phy_PingPong/Core/Src/dma.c \
 ../Application/Core/gnss1a1_gnss.c \
+../Application/Core/gnss_data.c \
+../Application/Core/gnss_parser.c \
 D:/Git/ProgettoMisureSulleReti2025/STM32CubeExpansion_LRWAN_V2.1.0/Projects/B-L072Z-LRWAN1/Applications/SubGHz_Phy/SubGHz_Phy_PingPong/Core/Src/main.c \
 D:/Git/ProgettoMisureSulleReti2025/STM32CubeExpansion_LRWAN_V2.1.0/Projects/B-L072Z-LRWAN1/Applications/SubGHz_Phy/SubGHz_Phy_PingPong/Core/Src/rtc.c \
 D:/Git/ProgettoMisureSulleReti2025/STM32CubeExpansion_LRWAN_V2.1.0/Projects/B-L072Z-LRWAN1/Applications/SubGHz_Phy/SubGHz_Phy_PingPong/Core/Src/rtc_if.c \
@@ -25,9 +28,12 @@ D:/Git/ProgettoMisureSulleReti2025/STM32CubeExpansion_LRWAN_V2.1.0/Projects/B-L0
 D:/Git/ProgettoMisureSulleReti2025/STM32CubeExpansion_LRWAN_V2.1.0/Projects/B-L072Z-LRWAN1/Applications/SubGHz_Phy/SubGHz_Phy_PingPong/Core/Src/usart_if.c 
 
 OBJS += \
+./Application/Core/NMEA_parser.o \
 ./Application/Core/app_gnss.o \
 ./Application/Core/dma.o \
 ./Application/Core/gnss1a1_gnss.o \
+./Application/Core/gnss_data.o \
+./Application/Core/gnss_parser.o \
 ./Application/Core/main.o \
 ./Application/Core/rtc.o \
 ./Application/Core/rtc_if.o \
@@ -45,9 +51,12 @@ OBJS += \
 ./Application/Core/usart_if.o 
 
 C_DEPS += \
+./Application/Core/NMEA_parser.d \
 ./Application/Core/app_gnss.d \
 ./Application/Core/dma.d \
 ./Application/Core/gnss1a1_gnss.d \
+./Application/Core/gnss_data.d \
+./Application/Core/gnss_parser.d \
 ./Application/Core/main.d \
 ./Application/Core/rtc.d \
 ./Application/Core/rtc_if.d \
@@ -94,7 +103,7 @@ Application/Core/usart_if.o: D:/Git/ProgettoMisureSulleReti2025/STM32CubeExpansi
 clean: clean-Application-2f-Core
 
 clean-Application-2f-Core:
-	-$(RM) ./Application/Core/app_gnss.cyclo ./Application/Core/app_gnss.d ./Application/Core/app_gnss.o ./Application/Core/app_gnss.su ./Application/Core/dma.cyclo ./Application/Core/dma.d ./Application/Core/dma.o ./Application/Core/dma.su ./Application/Core/gnss1a1_gnss.cyclo ./Application/Core/gnss1a1_gnss.d ./Application/Core/gnss1a1_gnss.o ./Application/Core/gnss1a1_gnss.su ./Application/Core/main.cyclo ./Application/Core/main.d ./Application/Core/main.o ./Application/Core/main.su ./Application/Core/rtc.cyclo ./Application/Core/rtc.d ./Application/Core/rtc.o ./Application/Core/rtc.su ./Application/Core/rtc_if.cyclo ./Application/Core/rtc_if.d ./Application/Core/rtc_if.o ./Application/Core/rtc_if.su ./Application/Core/stm32_bus_ex.cyclo ./Application/Core/stm32_bus_ex.d ./Application/Core/stm32_bus_ex.o ./Application/Core/stm32_bus_ex.su ./Application/Core/stm32_lpm_if.cyclo ./Application/Core/stm32_lpm_if.d ./Application/Core/stm32_lpm_if.o ./Application/Core/stm32_lpm_if.su ./Application/Core/stm32l0xx_hal_msp.cyclo ./Application/Core/stm32l0xx_hal_msp.d ./Application/Core/stm32l0xx_hal_msp.o ./Application/Core/stm32l0xx_hal_msp.su ./Application/Core/stm32l0xx_it.cyclo ./Application/Core/stm32l0xx_it.d ./Application/Core/stm32l0xx_it.o ./Application/Core/stm32l0xx_it.su ./Application/Core/sys_app.cyclo ./Application/Core/sys_app.d ./Application/Core/sys_app.o ./Application/Core/sys_app.su ./Application/Core/sys_debug.cyclo ./Application/Core/sys_debug.d ./Application/Core/sys_debug.o ./Application/Core/sys_debug.su ./Application/Core/teseo_liv3f.cyclo ./Application/Core/teseo_liv3f.d ./Application/Core/teseo_liv3f.o ./Application/Core/teseo_liv3f.su ./Application/Core/teseo_liv3f_i2c.cyclo ./Application/Core/teseo_liv3f_i2c.d ./Application/Core/teseo_liv3f_i2c.o ./Application/Core/teseo_liv3f_i2c.su ./Application/Core/teseo_liv3f_queue.cyclo ./Application/Core/teseo_liv3f_queue.d ./Application/Core/teseo_liv3f_queue.o ./Application/Core/teseo_liv3f_queue.su ./Application/Core/teseo_liv3f_uart.cyclo ./Application/Core/teseo_liv3f_uart.d ./Application/Core/teseo_liv3f_uart.o ./Application/Core/teseo_liv3f_uart.su ./Application/Core/usart.cyclo ./Application/Core/usart.d ./Application/Core/usart.o ./Application/Core/usart.su ./Application/Core/usart_if.cyclo ./Application/Core/usart_if.d ./Application/Core/usart_if.o ./Application/Core/usart_if.su
+	-$(RM) ./Application/Core/NMEA_parser.cyclo ./Application/Core/NMEA_parser.d ./Application/Core/NMEA_parser.o ./Application/Core/NMEA_parser.su ./Application/Core/app_gnss.cyclo ./Application/Core/app_gnss.d ./Application/Core/app_gnss.o ./Application/Core/app_gnss.su ./Application/Core/dma.cyclo ./Application/Core/dma.d ./Application/Core/dma.o ./Application/Core/dma.su ./Application/Core/gnss1a1_gnss.cyclo ./Application/Core/gnss1a1_gnss.d ./Application/Core/gnss1a1_gnss.o ./Application/Core/gnss1a1_gnss.su ./Application/Core/gnss_data.cyclo ./Application/Core/gnss_data.d ./Application/Core/gnss_data.o ./Application/Core/gnss_data.su ./Application/Core/gnss_parser.cyclo ./Application/Core/gnss_parser.d ./Application/Core/gnss_parser.o ./Application/Core/gnss_parser.su ./Application/Core/main.cyclo ./Application/Core/main.d ./Application/Core/main.o ./Application/Core/main.su ./Application/Core/rtc.cyclo ./Application/Core/rtc.d ./Application/Core/rtc.o ./Application/Core/rtc.su ./Application/Core/rtc_if.cyclo ./Application/Core/rtc_if.d ./Application/Core/rtc_if.o ./Application/Core/rtc_if.su ./Application/Core/stm32_bus_ex.cyclo ./Application/Core/stm32_bus_ex.d ./Application/Core/stm32_bus_ex.o ./Application/Core/stm32_bus_ex.su ./Application/Core/stm32_lpm_if.cyclo ./Application/Core/stm32_lpm_if.d ./Application/Core/stm32_lpm_if.o ./Application/Core/stm32_lpm_if.su ./Application/Core/stm32l0xx_hal_msp.cyclo ./Application/Core/stm32l0xx_hal_msp.d ./Application/Core/stm32l0xx_hal_msp.o ./Application/Core/stm32l0xx_hal_msp.su ./Application/Core/stm32l0xx_it.cyclo ./Application/Core/stm32l0xx_it.d ./Application/Core/stm32l0xx_it.o ./Application/Core/stm32l0xx_it.su ./Application/Core/sys_app.cyclo ./Application/Core/sys_app.d ./Application/Core/sys_app.o ./Application/Core/sys_app.su ./Application/Core/sys_debug.cyclo ./Application/Core/sys_debug.d ./Application/Core/sys_debug.o ./Application/Core/sys_debug.su ./Application/Core/teseo_liv3f.cyclo ./Application/Core/teseo_liv3f.d ./Application/Core/teseo_liv3f.o ./Application/Core/teseo_liv3f.su ./Application/Core/teseo_liv3f_i2c.cyclo ./Application/Core/teseo_liv3f_i2c.d ./Application/Core/teseo_liv3f_i2c.o ./Application/Core/teseo_liv3f_i2c.su ./Application/Core/teseo_liv3f_queue.cyclo ./Application/Core/teseo_liv3f_queue.d ./Application/Core/teseo_liv3f_queue.o ./Application/Core/teseo_liv3f_queue.su ./Application/Core/teseo_liv3f_uart.cyclo ./Application/Core/teseo_liv3f_uart.d ./Application/Core/teseo_liv3f_uart.o ./Application/Core/teseo_liv3f_uart.su ./Application/Core/usart.cyclo ./Application/Core/usart.d ./Application/Core/usart.o ./Application/Core/usart.su ./Application/Core/usart_if.cyclo ./Application/Core/usart_if.d ./Application/Core/usart_if.o ./Application/Core/usart_if.su
 
 .PHONY: clean-Application-2f-Core
 
