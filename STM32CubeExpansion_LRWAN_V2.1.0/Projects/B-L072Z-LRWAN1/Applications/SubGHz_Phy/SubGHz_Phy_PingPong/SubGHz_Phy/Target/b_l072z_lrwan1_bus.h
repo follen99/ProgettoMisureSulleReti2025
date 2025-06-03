@@ -30,6 +30,8 @@ extern "C" {
 #endif
 
 #include "stm32l0xx_hal.h"
+#include "stm32_bus_ex.h"
+
 
 #ifndef USE_HAL_SPI_REGISTER_CALLBACKS
 #define USE_HAL_SPI_REGISTER_CALLBACKS 0U

@@ -46,6 +46,7 @@
 #include "gnss_data.h"
 #include "gnss_parser.h"
 #include <stdio.h>
+#include "b-l072z-lrwan1.h"
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
@@ -116,7 +117,8 @@ int8_t SnrValue = 0;
 static UTIL_TIMER_Object_t timerLed;
 /* device state. Master: true, Slave: false*/
 //bool isMaster = true;
-static int MASTER = 0;
+static int MASTER = 1;
+static int buttonPressed = 0;
 /* random delay to make sure 2 devices will sync*/
 /* the closest the random delays are, the longer it will
    take for the devices to sync when started simultaneously*/
@@ -166,6 +168,7 @@ static void OnledEvent(void *context);
 //static void PingPong_Process(void);
 static void Master(void);
 static void Slave(void);
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 /* USER CODE END PFP */
 
 /* Exported functions ---------------------------------------------------------*/
@@ -188,6 +191,8 @@ void SubghzApp_Init(void)
   if (MASTER == 1) {
       MX_GNSS_Init();
   }
+
+  BSP_PB_Init(BUTTON_USER, BUTTON_MODE_EXTI);
 
   /* Radio initialization */
   RadioEvents.TxDone = OnTxDone;
@@ -257,6 +262,7 @@ void SubghzApp_Init(void)
   /*register task to to be run in while(1) after Radio IT*/
   if(MASTER==1){
 	  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Master), UTIL_SEQ_RFU, Master);
+	  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_GNSS), UTIL_SEQ_RFU, MX_GNSS_Process);
   }
   else{
 	  UTIL_SEQ_RegTask((1 << CFG_SEQ_Task_SubGHz_Phy_App_Slave), UTIL_SEQ_RFU, Slave);
@@ -270,6 +276,19 @@ void SubghzApp_Init(void)
 /* USER CODE END EF */
 
 /* Private functions ---------------------------------------------------------*/
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if (GPIO_Pin == KEY_BUTTON_PIN)
+  {
+    BSP_LED_Toggle(LED2);
+    buttonPressed = true;               // Indico che il bottone è stato premuto
+    //UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_SubGHz_Phy_App_Master, CFG_SEQ_Prio_0);
+    UTIL_SEQ_SetTask(1 << CFG_SEQ_Task_GNSS, CFG_SEQ_Prio_0);
+    //MX_GNSS_Process();
+  }
+}
+
 
 static void OnTxDone(void)
 {

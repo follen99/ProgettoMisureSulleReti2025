@@ -213,7 +213,7 @@ static int32_t TESEO_LIV3F_Enable(TESEO_LIV3F_Object_t *pObj)
   }
   else if(pObj->IO.BusType == TESEO_LIV3F_UART_BUS)
   {
-    teseo_uart_rx_enable(&pObj->Ctx);
+    //teseo_uart_rx_enable(&pObj->Ctx);
   }
   else
   {

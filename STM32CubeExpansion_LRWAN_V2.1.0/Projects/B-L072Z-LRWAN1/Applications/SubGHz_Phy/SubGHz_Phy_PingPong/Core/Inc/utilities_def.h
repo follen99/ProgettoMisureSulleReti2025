@@ -81,6 +81,7 @@ typedef enum
   /* USER CODE BEGIN CFG_SEQ_Task_Id_t */
   CFG_SEQ_Task_SubGHz_Phy_App_Master,
   CFG_SEQ_Task_SubGHz_Phy_App_Slave,
+  CFG_SEQ_Task_GNSS,
   /* USER CODE END CFG_SEQ_Task_Id_t */
   CFG_SEQ_Task_NBR
 } CFG_SEQ_Task_Id_t;

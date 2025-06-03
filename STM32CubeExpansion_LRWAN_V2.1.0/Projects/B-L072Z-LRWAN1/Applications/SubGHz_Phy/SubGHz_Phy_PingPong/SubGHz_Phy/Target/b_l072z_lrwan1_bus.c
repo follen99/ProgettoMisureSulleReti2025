@@ -23,9 +23,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "b_l072z_lrwan1_bus.h"
 #include "b_l072z_lrwan1_errno.h"
-
-
-
+//#include "stm32l0xx_hal_i2c_ex.h"
 
 #define TIMEOUT_DURATION 1000
 /** @addtogroup BSP
@@ -456,10 +454,12 @@ int32_t BSP_I2C1_Init(void)
         {
           ret = BSP_ERROR_BUS_FAILURE;
         }
+        /*
         else if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
         {
           ret = BSP_ERROR_BUS_FAILURE;
         }
+        */
         else
         {
           ret = BSP_ERROR_NONE;
@@ -734,7 +734,7 @@ __weak HAL_StatusTypeDef MX_I2C1_Init(I2C_HandleTypeDef *hi2c)
   {
     ret = HAL_ERROR;
   }
-
+/*
   if (HAL_I2CEx_ConfigAnalogFilter(hi2c, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
   {
     ret = HAL_ERROR;
@@ -744,7 +744,7 @@ __weak HAL_StatusTypeDef MX_I2C1_Init(I2C_HandleTypeDef *hi2c)
   {
     ret = HAL_ERROR;
   }
-
+*/
   return ret;
 }
 
@@ -777,7 +777,10 @@ static void I2C1_MspInit(I2C_HandleTypeDef *i2cHandle)
   /* Peripheral clock enable */
   __HAL_RCC_I2C1_CLK_ENABLE();
   /* USER CODE BEGIN I2C1_MspInit 1 */
-
+  /*
+  HAL_NVIC_SetPriority(I2C1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(I2C1_IRQn);
+  */
   /* USER CODE END I2C1_MspInit 1 */
 }
 
