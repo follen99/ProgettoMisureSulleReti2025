@@ -655,6 +655,7 @@ __weak void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c)
 }
 
 #if (USE_HAL_I2C_REGISTER_CALLBACKS == 1)
+
 /**
   * @brief  Register a User I2C Callback
   *         To be used instead of the weak predefined callback

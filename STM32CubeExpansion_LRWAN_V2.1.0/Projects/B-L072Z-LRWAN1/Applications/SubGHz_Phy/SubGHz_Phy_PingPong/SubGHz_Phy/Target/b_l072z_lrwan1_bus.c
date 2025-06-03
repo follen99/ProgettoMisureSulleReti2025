@@ -23,9 +23,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "b_l072z_lrwan1_bus.h"
 #include "b_l072z_lrwan1_errno.h"
-#include "stm32l0xx_hal.h"
-#include "stm32l0xx_hal_i2c.h"
-#include "stm32l0xx_hal_conf.h"
+
+
+
 
 #define TIMEOUT_DURATION 1000
 /** @addtogroup BSP
@@ -672,7 +672,7 @@ int32_t BSP_I2C1_Recv(uint16_t DevAddr, uint8_t *pData, uint16_t Length)
 }
 
 
-/*
+
 #if (USE_HAL_I2C_REGISTER_CALLBACKS == 1U)
 
 
@@ -714,7 +714,7 @@ int32_t BSP_I2C1_RegisterMspCallbacks(BSP_I2C_Cb_t *Callbacks)
   return BSP_ERROR_NONE;
 }
 
-#endif */ /* USE_HAL_I2C_REGISTER_CALLBACKS == 1U */
+#endif  /* USE_HAL_I2C_REGISTER_CALLBACKS == 1U */
 
 /* I2C1 init function */
 
