@@ -1,0 +1,65 @@
+# STM32 specific
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+*.d
+*.o
+*.obj
+*.dep
+*.su
+*.crf
+*.axf
+
+# Keil uVision
+*.uvoptx
+*.uvprojx
+*.uvguix.*
+*.bak
+
+# IAR Embedded Workbench
+*.ewd
+*.ewp
+*.ewt
+*.eww
+*.dep
+*.lst
+*.map
+*.srec
+*.r79
+*.xcl
+
+# STM32CubeIDE
+.settings/
+.cproject
+.project
+*.launch
+*.log
+*.ioc
+
+# Build directories
+build/
+Debug/
+debug/
+Release/
+release/
+out/
+output/
+
+# Other
+*.swp
+*.swo
+*.swn
+*.tmp
+*.user
+*.bak
+*.orig
+*.save
+*.zip
+*.tar.gz
+*.DS_Store
+Thumbs.db
+
+# custom
+*.prefs
