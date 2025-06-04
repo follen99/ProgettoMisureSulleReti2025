@@ -1,7 +1,6 @@
 "./Application/App/app_subghz_phy.o"
 "./Application/App/subghz_phy_app.o"
 "./Application/Core/dma.o"
-"./Application/Core/gnss.o"
 "./Application/Core/main.o"
 "./Application/Core/rtc.o"
 "./Application/Core/rtc_if.o"

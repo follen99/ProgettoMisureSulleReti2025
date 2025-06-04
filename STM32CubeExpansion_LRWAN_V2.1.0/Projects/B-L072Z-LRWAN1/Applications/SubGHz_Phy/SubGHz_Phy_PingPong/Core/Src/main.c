@@ -20,10 +20,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "app_subghz_phy.h"
+#include "sys_app.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+extern UART_HandleTypeDef huart1;
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -78,13 +79,13 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
-
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  MX_SubGHz_Phy_Init();
+  //MX_SubGHz_Phy_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -94,8 +95,10 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    MX_SubGHz_Phy_Process();
-
+    //MX_SubGHz_Phy_Process();
+	  char buf[32];
+	  HAL_UART_Receive(&huart1, buf, sizeof(buf), 2000);
+	  APP_LOG(TS_OFF, VLEVEL_M, buf);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
