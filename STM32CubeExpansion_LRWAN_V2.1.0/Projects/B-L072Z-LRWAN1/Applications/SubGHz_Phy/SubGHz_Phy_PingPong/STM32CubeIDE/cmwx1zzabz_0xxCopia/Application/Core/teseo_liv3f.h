@@ -130,7 +130,7 @@ typedef struct
 #define TESEO_LIV3F_OK                  (0)
 #define TESEO_LIV3F_ERROR               (-1)
 
-#define TESEO_LIV3F_UART_BUS            (0U)
+#define TESEO_LIV3F_UART_BUS            (1U)
 #define TESEO_LIV3F_I2C_BUS             (1U)
 
 #define TESEO_LIV3F_I2C_7BITS_ADDR      0x3A

@@ -63,7 +63,8 @@ static void MX_SimOSGetPos_Process(void)
 
   GNSS_PARSER_Init(&GNSSParser_Data);
 
-
+  for(;;)
+  {
 #if (USE_I2C == 1)
     GNSS1A1_GNSS_BackgroundProcess(GNSS1A1_TESEO_LIV3F);
 #endif /* USE_I2C */
@@ -101,7 +102,7 @@ static void MX_SimOSGetPos_Process(void)
 
     if(gnssMsg == NULL)
     {
-      return;
+      continue;
     }
 
     check = GNSS_PARSER_CheckSanity((uint8_t *)gnssMsg->buf, gnssMsg->len);
@@ -134,7 +135,7 @@ static void MX_SimOSGetPos_Process(void)
     }
 
     GNSS1A1_GNSS_ReleaseMessage(GNSS1A1_TESEO_LIV3F, gnssMsg);
-
+  }
 }
 
 #if (configUSE_FEATURE == 1)
@@ -169,12 +170,8 @@ static void AppGeofenceCfg(char *command)
 }
 #endif /* configUSE_FEATURE */
 
-int GNSS_PRINT(char *pBuffer)
-{
+int GNSS_PRINT(char *pBuffer);
 
-}
 
-int GNSS_PUTC(char pChar)
-{
+int GNSS_PUTC(char pChar);
 
-}
