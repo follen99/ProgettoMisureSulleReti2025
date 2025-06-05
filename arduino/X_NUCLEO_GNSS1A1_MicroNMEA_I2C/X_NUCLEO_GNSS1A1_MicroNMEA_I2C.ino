@@ -176,6 +176,11 @@ void printPositionFull()
    console.println("-----------------------");
 }
 
+long lastLatitude = 0;
+long lastLongitude = 0;
+String incomingMessage = "";
+
+
 // trasmette la posizione via UART
 // esempio: "45.123456,12.123456"
 // ATTENZIONE: potrebbe essere necessario usare Serial.println() invece di console.println()
@@ -184,6 +189,10 @@ void transferPositionUART()
    long latitude_mdeg = nmea.getLatitude();
    long longitude_mdeg = nmea.getLongitude();
    //console.print("Latitude (deg): ");
+
+   lastLatitude = latitude_mdeg;
+   lastLongitude = longitude_mdeg;
+
    console.print(latitude_mdeg / 1000000., 6);
 
    console.print(",");
@@ -243,6 +252,24 @@ void setup(void)
 
 void loop(void)
 {
+
+   while (Serial.available() > 0) {
+    char received = Serial.read();
+    if (received == '\n') { // fine messaggio (newline)
+      incomingMessage.trim(); // rimuove spazi e newline
+      if (incomingMessage == "invia") {
+        console.print(lastLatitude / 1000000., 6);
+
+         console.print(",");
+         //console.print("Longitude (deg): ");
+         console.print(lastLongitude / 1000000., 6);
+      }
+      incomingMessage = ""; // reset per il prossimo messaggio
+    } else {
+      incomingMessage += received;
+    }
+  }
+
    // If a message is recieved print all the informations
    if (ppsTriggered)
    {
