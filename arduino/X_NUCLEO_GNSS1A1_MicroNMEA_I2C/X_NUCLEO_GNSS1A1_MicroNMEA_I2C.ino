@@ -183,9 +183,8 @@ void transferPositionUART()
 {
    double lat = nmea.getLatitude() / 1000000.0;
    double lon = nmea.getLongitude() / 1000000.0;
-   console.print(lat, 6);
-   console.print(",");
-   console.println(lon, 6);
+   String msg = String(lat, 6) + "," + String(lon, 6);
+   console.println(msg);
 }
 
 void setup(void)
