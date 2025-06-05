@@ -36,14 +36,17 @@
  ******************************************************************************
  */
 
-//NOTE: In order for this example to work, the jumper J4 on the device should
-//      be moved to J8
-//NOTE: This example is compatible with the Arduino Uno board
+// NOTE: In order for this example to work, the jumper J4 on the device should
+//       be moved to J8
+// NOTE: This example is compatible with the Arduino Uno board
 
 #include <MicroNMEA.h>
 #include <Wire.h>
 
-//I2C communication parameters
+// modalità di debug
+//#define DEBUG_MODE
+
+// I2C communication parameters
 #define DEFAULT_DEVICE_ADDRESS 0x3A
 #define DEFAULT_DEVICE_PORT 0xFF
 #define I2C_DELAY 1
@@ -63,76 +66,152 @@
 #endif
 
 // Refer to Stream devices by use
-HardwareSerial& console = Serial;
-TwoWire& gps = DEV_I2C;
+HardwareSerial &console = Serial;
+TwoWire &gps = DEV_I2C;
 
-//I2C read data structures
+// I2C read data structures
 char buff[32];
 int idx = 0;
 
-//MicroNMEA library structures
+// MicroNMEA library structures
 char nmeaBuffer[100];
 MicroNMEA nmea(nmeaBuffer, sizeof(nmeaBuffer));
-
 
 bool ledState = LOW;
 volatile bool ppsTriggered = false;
 
-
 void ppsHandler(void);
-
 
 void ppsHandler(void)
 {
-  ppsTriggered = true;
+   ppsTriggered = true;
 }
-
 
 void gpsHardwareReset()
 {
-   //reset the device
+   // reset the device
    digitalWrite(RESET_PIN, LOW);
    delay(50);
    digitalWrite(RESET_PIN, HIGH);
 
-   //wait for reset to apply
+   // wait for reset to apply
    delay(2000);
-
 }
 
-//Read 32 bytes from I2C
+// Read 32 bytes from I2C
 void readI2C(char *inBuff)
 {
    gps.beginTransmission(DEFAULT_DEVICE_ADDRESS);
-   gps.write((uint8_t) DEFAULT_DEVICE_PORT);
+   gps.write((uint8_t)DEFAULT_DEVICE_PORT);
    gps.endTransmission(false);
-   gps.requestFrom((uint8_t)DEFAULT_DEVICE_ADDRESS, (uint8_t) 32);
+   gps.requestFrom((uint8_t)DEFAULT_DEVICE_ADDRESS, (uint8_t)32);
    int i = 0;
    while (gps.available())
    {
-      inBuff[i]= gps.read();
+      inBuff[i] = gps.read();
       i++;
    }
 }
 
-//Send a NMEA command via I2C
+// Send a NMEA command via I2C
 void sendCommand(char *cmd)
 {
    gps.beginTransmission(DEFAULT_DEVICE_ADDRESS);
-   gps.write((uint8_t) DEFAULT_DEVICE_PORT);
+   gps.write((uint8_t)DEFAULT_DEVICE_PORT);
    MicroNMEA::sendSentence(gps, cmd);
    gps.endTransmission(true);
+}
+
+// stampa la posizione in modo completo
+void printPositionFull()
+{
+   console.println("ppsTriggered == true");
+   console.print("Valid fix: ");
+   console.println("yes");
+
+   console.print("Nav. system: ");
+   if (nmea.getNavSystem())
+      console.println(nmea.getNavSystem());
+   else
+      console.println("none");
+
+   console.print("Num. satellites: ");
+   console.println(nmea.getNumSatellites());
+
+   console.print("HDOP: ");
+   console.println(nmea.getHDOP() / 10., 1);
+
+   console.print("Date/time: ");
+   console.print(nmea.getYear());
+   console.print('-');
+   console.print(int(nmea.getMonth()));
+   console.print('-');
+   console.print(int(nmea.getDay()));
+   console.print('T');
+   console.print(int(nmea.getHour()));
+   console.print(':');
+   console.print(int(nmea.getMinute()));
+   console.print(':');
+   console.println(int(nmea.getSecond()));
+
+   long latitude_mdeg = nmea.getLatitude();
+   long longitude_mdeg = nmea.getLongitude();
+   console.print("Latitude (deg): ");
+   console.println(latitude_mdeg / 1000000., 6);
+
+   console.print("Longitude (deg): ");
+   console.println(longitude_mdeg / 1000000., 6);
+
+   long alt;
+   console.print("Altitude (m): ");
+   if (nmea.getAltitude(alt))
+      console.println(alt / 1000., 3);
+   else
+      console.println("not available");
+
+   console.print("Speed: ");
+   console.println(nmea.getSpeed() / 1000., 3);
+   console.print("Course: ");
+   console.println(nmea.getCourse() / 1000., 3);
+   console.println("-----------------------");
+}
+
+long lastLatitude = 0;
+long lastLongitude = 0;
+String incomingMessage = "";
+
+
+// trasmette la posizione via UART
+// esempio: "45.123456,12.123456"
+// ATTENZIONE: potrebbe essere necessario usare Serial.println() invece di console.println()
+void transferPositionUART()
+{
+   long latitude_mdeg = nmea.getLatitude();
+   long longitude_mdeg = nmea.getLongitude();
+   //console.print("Latitude (deg): ");
+
+   lastLatitude = latitude_mdeg;
+   lastLongitude = longitude_mdeg;
+
+   console.print(latitude_mdeg / 1000000., 6);
+
+   console.print(",");
+   //console.print("Longitude (deg): ");
+   console.print(longitude_mdeg / 1000000., 6);
+
+
+   console.println();
 }
 
 void setup(void)
 {
    console.begin(115200); // console
-   gps.begin(); // gps
+   gps.begin();           // gps
 
    pinMode(LED_BUILTIN, OUTPUT);
    digitalWrite(LED_BUILTIN, ledState);
 
-   //Start the module
+   // Start the module
    pinMode(RESET_PIN, OUTPUT);
    digitalWrite(RESET_PIN, HIGH);
    console.println("Resetting GPS module ...");
@@ -143,15 +222,15 @@ void setup(void)
    sendCommand("$PSTMSETPAR,1231,0x00000042");
    sendCommand("$PSTMSAVEPAR");
 
-   //Reset the device so that the changes could take plaace
+   // Reset the device so that the changes could take plaace
    sendCommand("$PSTMSRR");
 
    delay(4000);
 
-   //Reinitialize I2C after the reset
+   // Reinitialize I2C after the reset
    gps.begin();
 
-   //clear i2c buffer
+   // clear i2c buffer
    char c;
    idx = 0;
    memset(buff, 0, 32);
@@ -165,8 +244,7 @@ void setup(void)
       c = buff[idx];
       idx++;
       idx %= 32;
-   }
-   while ((uint8_t) c != 0xFF);
+   } while ((uint8_t)c != 0xFF);
 
    pinMode(2, INPUT);
    attachInterrupt(digitalPinToInterrupt(2), ppsHandler, RISING);
@@ -174,7 +252,25 @@ void setup(void)
 
 void loop(void)
 {
-   //If a message is recieved print all the informations
+
+   while (Serial.available() > 0) {
+    char received = Serial.read();
+    if (received == '\n') { // fine messaggio (newline)
+      incomingMessage.trim(); // rimuove spazi e newline
+      if (incomingMessage == "invia") {
+        console.print(lastLatitude / 1000000., 6);
+
+         console.print(",");
+         //console.print("Longitude (deg): ");
+         console.print(lastLongitude / 1000000., 6);
+      }
+      incomingMessage = ""; // reset per il prossimo messaggio
+    } else {
+      incomingMessage += received;
+    }
+  }
+
+   // If a message is recieved print all the informations
    if (ppsTriggered)
    {
       ppsTriggered = false;
@@ -184,76 +280,32 @@ void loop(void)
       // Stampa solo se fix valido e almeno 1 satellite
       if (nmea.isValid() && nmea.getNumSatellites() > 0)
       {
-         console.println("ppsTriggered == true");
-         console.print("Valid fix: ");
-         console.println("yes");
-
-         console.print("Nav. system: ");
-         if (nmea.getNavSystem())
-            console.println(nmea.getNavSystem());
-         else
-            console.println("none");
-
-         console.print("Num. satellites: ");
-         console.println(nmea.getNumSatellites());
-
-         console.print("HDOP: ");
-         console.println(nmea.getHDOP()/10., 1);
-
-         console.print("Date/time: ");
-         console.print(nmea.getYear());
-         console.print('-');
-         console.print(int(nmea.getMonth()));
-         console.print('-');
-         console.print(int(nmea.getDay()));
-         console.print('T');
-         console.print(int(nmea.getHour()));
-         console.print(':');
-         console.print(int(nmea.getMinute()));
-         console.print(':');
-         console.println(int(nmea.getSecond()));
-
-         long latitude_mdeg = nmea.getLatitude();
-         long longitude_mdeg = nmea.getLongitude();
-         console.print("Latitude (deg): ");
-         console.println(latitude_mdeg / 1000000., 6);
-
-         console.print("Longitude (deg): ");
-         console.println(longitude_mdeg / 1000000., 6);
-
-         long alt;
-         console.print("Altitude (m): ");
-         if (nmea.getAltitude(alt))
-            console.println(alt / 1000., 3);
-         else
-            console.println("not available");
-
-         console.print("Speed: ");
-         console.println(nmea.getSpeed() / 1000., 3);
-         console.print("Course: ");
-         console.println(nmea.getCourse() / 1000., 3);
-         console.println("-----------------------");
+#ifdef DEBUG_MODE
+         printPositionFull();
+#else
+         transferPositionUART();
+#endif
       }
       nmea.clear();
    }
 
-   //While the message isn't complete
-   while (!ppsTriggered )
+   // While the message isn't complete
+   while (!ppsTriggered)
    {
-      char c ;
+      char c;
       if (idx == 0)
       {
          readI2C(buff);
          delay(I2C_DELAY);
       }
-      //Fetch the character one by one
+      // Fetch the character one by one
       c = buff[idx];
       idx++;
       idx %= 32;
-      //If we have a valid character pass it to the library
-      if ((uint8_t) c != 0xFF)
+      // If we have a valid character pass it to the library
+      if ((uint8_t)c != 0xFF)
       {
-         //console.print(c); // opzionale: togli la stampa carattere per carattere
+         // console.print(c); // opzionale: togli la stampa carattere per carattere
          nmea.process(c);
       }
    }
