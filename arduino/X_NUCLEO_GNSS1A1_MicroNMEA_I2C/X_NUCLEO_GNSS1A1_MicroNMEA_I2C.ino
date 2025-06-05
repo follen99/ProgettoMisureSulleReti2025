@@ -44,7 +44,7 @@
 #include <Wire.h>
 
 // modalità di debug
-#define DEBUG_MODE
+//#define DEBUG_MODE
 
 // I2C communication parameters
 #define DEFAULT_DEVICE_ADDRESS 0x3A
@@ -181,10 +181,17 @@ void printPositionFull()
 // ATTENZIONE: potrebbe essere necessario usare Serial.println() invece di console.println()
 void transferPositionUART()
 {
-   double lat = nmea.getLatitude() / 1000000.0;
-   double lon = nmea.getLongitude() / 1000000.0;
-   String msg = String(lat, 6) + "," + String(lon, 6);
-   console.println(msg);
+   long latitude_mdeg = nmea.getLatitude();
+   long longitude_mdeg = nmea.getLongitude();
+   //console.print("Latitude (deg): ");
+   console.print(latitude_mdeg / 1000000., 6);
+
+   console.print(",");
+   //console.print("Longitude (deg): ");
+   console.print(longitude_mdeg / 1000000., 6);
+
+
+   console.println();
 }
 
 void setup(void)
