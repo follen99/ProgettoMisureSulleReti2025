@@ -43,6 +43,7 @@
 #include "stm32_seq.h"
 #include "utilities_def.h"
 #include "b-l072z-lrwan1.h"
+#include "usart.h"
 /* USER CODE END Includes */
 
 /* External variables ---------------------------------------------------------*/
@@ -115,6 +116,7 @@ static UTIL_TIMER_Object_t timerLed;
 bool isMaster = true;
 static int MASTER = 1;
 static int buttonPressed = 0;
+extern UART_HandleTypeDef huart1;
 /* random delay to make sure 2 devices will sync*/
 /* the closest the random delays are, the longer it will
    take for the devices to sync when started simultaneously*/
@@ -400,43 +402,43 @@ static void Master(void) {
     switch (State)
     {
         case TX:
-            APP_LOG(TS_ON, VLEVEL_L, "Master: waiting for ACK...\n\r");
+            APP_LOG(TS_ON, VLEVEL_L, "Master: Messaggio inviato, in attesa di ACK...\n\r");
             Radio.Rx(RX_TIMEOUT_VALUE);
             gpsSent = true;
-            buttonPressed = false;   // Resetto il flag, perché ho già mandato il pacchetto
+            buttonPressed = false;  // Reset: pacchetto già inviato
             break;
 
         case RX:
             if (gpsSent && RxBufferSize > 0)
             {
-                if (strncmp((const char *)BufferRx, ACK, sizeof(ACK) - 1) == 0)
+                if (strncmp((const char *)BufferRx, ACK, strlen(ACK)) == 0)
                 {
                     UTIL_TIMER_Stop(&timerLed);
                     LED_Off(LED_RED2);
                     LED_Toggle(LED_RED1);
-                    APP_LOG(TS_ON, VLEVEL_L, "Master: ACK received.\n\r");
+                    APP_LOG(TS_ON, VLEVEL_L, "Master: ACK ricevuto ✅\n\r");
                 }
                 else
                 {
-                    APP_LOG(TS_ON, VLEVEL_L, "Master: Unexpected message.\n\r");
+                    APP_LOG(TS_ON, VLEVEL_L, "Master: Messaggio inatteso ricevuto ❌\n\r");
                 }
-                gpsSent = false;
+                gpsSent = false;  // Reset per permettere nuovo invio
             }
             else
             {
-                APP_LOG(TS_ON, VLEVEL_L, "Master: Nothing to process in RX\n\r");
+                APP_LOG(TS_ON, VLEVEL_L, "Master: Nessun dato utile ricevuto.\n\r");
             }
             break;
 
         case RX_TIMEOUT:
         case RX_ERROR:
-            APP_LOG(TS_ON, VLEVEL_L, "Master: Timeout/Error. Listening again...\n\r");
+            APP_LOG(TS_ON, VLEVEL_L, "Master: Timeout o errore, riascolto...\n\r");
             Radio.Rx(RX_TIMEOUT_VALUE);
             gpsSent = false;
             break;
 
         case TX_TIMEOUT:
-            APP_LOG(TS_ON, VLEVEL_L, "Master: TX timeout, retry\n\r");
+            APP_LOG(TS_ON, VLEVEL_L, "Master: Timeout di trasmissione, riprovo.\n\r");
             gpsSent = false;
             break;
 
@@ -444,14 +446,53 @@ static void Master(void) {
             break;
     }
 
-    // SOLO QUI mando il pacchetto se il bottone è premuto e non è già in attesa di ACK
-    if(buttonPressed && !gpsSent)
+    // Se il bottone è premuto e non siamo già in attesa di ACK
+    if (buttonPressed && !gpsSent)
     {
-        memcpy(BufferTx, GPS, sizeof(GPS) - 1);
-        APP_LOG(TS_ON, VLEVEL_L, "Master Tx start: sending GPS\n\r");
-        Radio.Send(BufferTx, PAYLOAD_LEN);
+        char uartBuf[64] = {0};  // buffer più grande per messaggi lunghi
+        uint8_t ch;
+        int i = 0;
+
+        // Invia comando "invia\n" su UART
+        const char* cmd = "invia\n";
+        MX_USART1_UART_Init();  // inizializzazione UART (se necessaria)
+        HAL_UART_Transmit(&huart1, (uint8_t*)cmd, strlen(cmd), 100);
+
+        // Ricezione byte per byte fino a \n o timeout
+        for (i = 0; i < sizeof(uartBuf) - 1; ++i)
+        {
+            if (HAL_UART_Receive(&huart1, &ch, 1, 200) == HAL_OK)
+            {
+                uartBuf[i] = ch;
+                if (ch == '\n') {
+                    ++i;  // includi il newline
+                    break;
+                }
+            }
+            else
+            {
+                break;  // timeout
+            }
+        }
+        uartBuf[i] = '\0';  // terminatore stringa
+
+        if (i > 0)
+        {
+            memset(BufferTx, 0, MAX_APP_BUFFER_SIZE);
+            memcpy(BufferTx, uartBuf, i);  // usa solo la lunghezza letta
+            APP_LOG(TS_ON, VLEVEL_L, "Master: Invio messaggio UART (%d bytes): %s\n\r", i, uartBuf);
+            Radio.Send(BufferTx, i);
+        }
+        else
+        {
+            APP_LOG(TS_ON, VLEVEL_L, "Master: Nessuna risposta valida dalla UART ❌\n\r");
+        }
+
+        buttonPressed = false;  // reset
     }
+
 }
+
 
 
 static void Slave(void) {
@@ -462,59 +503,54 @@ static void Slave(void) {
         case RX:
             if (RxBufferSize > 0)
             {
-                if (strncmp((const char *)BufferRx, GPS, sizeof(GPS) - 1) == 0)
-                {
-                    // Ricevuto messaggio GPS dal master
-                    UTIL_TIMER_Stop(&timerLed);
-                    LED_Off(LED_RED1);
-                    LED_Toggle(LED_RED2);
-                    APP_LOG(TS_ON, VLEVEL_L, "Slave: GPS received. Sending ACK...\n\r");
-
-                    // Aggiunta attesa prima dell'invio dell'ACK
-                    uint32_t ackDelay = 5000; // ritardo tra 200 e 299 ms
-                    HAL_Delay(Radio.GetWakeupTime() + RX_TIME_MARGIN + ackDelay);
-
-                    memcpy(BufferTx, ACK, sizeof(ACK) - 1);
-                    Radio.Send(BufferTx, PAYLOAD_LEN);
+                // Assicurati che BufferRx sia terminato da '\0' per stampa come stringa
+                if (RxBufferSize < MAX_APP_BUFFER_SIZE) {
+                    BufferRx[RxBufferSize] = '\0';
+                } else {
+                    BufferRx[MAX_APP_BUFFER_SIZE - 1] = '\0'; // Sicurezza
                 }
-                else
-                {
-                    // Ricevuto messaggio inatteso: ignora e rimetti in ascolto
-                    APP_LOG(TS_ON, VLEVEL_L, "Slave: Unexpected message. Listening again...\n\r");
-                    Radio.Rx(RX_TIMEOUT_VALUE);
-                }
+
+                APP_LOG(TS_ON, VLEVEL_L, "Slave: Messaggio ricevuto (%d bytes): %s\n\r", RxBufferSize, BufferRx);
+
+                UTIL_TIMER_Stop(&timerLed);
+                LED_Off(LED_RED1);
+                LED_Toggle(LED_RED2);
+
+                HAL_Delay(Radio.GetWakeupTime() + RX_TIME_MARGIN + 250);
+
+                memset(BufferTx, 0, MAX_APP_BUFFER_SIZE);
+                memcpy(BufferTx, ACK, strlen(ACK));
+                Radio.Send(BufferTx, strlen(ACK));
             }
             else
             {
-                // Nessun dato ricevuto, rimetti in ascolto
-                APP_LOG(TS_ON, VLEVEL_L, "Slave: Empty buffer. Listening again...\n\r");
+                APP_LOG(TS_ON, VLEVEL_L, "Slave: Buffer vuoto. In ascolto...\n\r");
                 Radio.Rx(RX_TIMEOUT_VALUE);
             }
             break;
 
         case TX:
-            // Dopo aver inviato ACK, torna in ascolto
-            APP_LOG(TS_ON, VLEVEL_L, "Slave: ACK sent. Listening...\n\r");
+            APP_LOG(TS_ON, VLEVEL_L, "Slave: ACK inviato ✅. Ritorno in ascolto...\n\r");
             Radio.Rx(RX_TIMEOUT_VALUE);
             break;
 
         case RX_TIMEOUT:
         case RX_ERROR:
-            // Timeout o errore: continua ad ascoltare
-            APP_LOG(TS_ON, VLEVEL_L, "Slave: Timeout or error. Listening again...\n\r");
+            APP_LOG(TS_ON, VLEVEL_L, "Slave: Timeout o errore in ricezione. Riprovo...\n\r");
             Radio.Rx(RX_TIMEOUT_VALUE);
             break;
 
         case TX_TIMEOUT:
-            // Timeout nella trasmissione: ritenta ad ascoltare
-            APP_LOG(TS_ON, VLEVEL_L, "Slave: TX timeout. Listening again...\n\r");
+            APP_LOG(TS_ON, VLEVEL_L, "Slave: Timeout di trasmissione ❌. Riprovo ascolto...\n\r");
             Radio.Rx(RX_TIMEOUT_VALUE);
             break;
 
         default:
+            Radio.Rx(RX_TIMEOUT_VALUE);
             break;
     }
 }
+
 
 
 

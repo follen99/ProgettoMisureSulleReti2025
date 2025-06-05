@@ -20,11 +20,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "app_subghz_phy.h"
-#include "sys_app.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-extern UART_HandleTypeDef huart1;
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -79,13 +78,13 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
-  MX_USART1_UART_Init();
+
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  //MX_SubGHz_Phy_Init();
+  MX_SubGHz_Phy_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -95,10 +94,12 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    //MX_SubGHz_Phy_Process();
-	  char buf[32];
-	  HAL_UART_Receive(&huart1, buf, sizeof(buf), 2000);
-	  APP_LOG(TS_OFF, VLEVEL_M, buf);
+    MX_SubGHz_Phy_Process();
+	  //char buf[32];
+	  //MX_USART1_UART_Init();
+	  //HAL_UART_Receive(&huart1, (unsigned char *) buf, sizeof(buf),100);
+	  //HAL_UART_Transmit(&huart1, (uint8_t*)buf, strlen(buf), 100);
+	  //APP_LOG(TS_OFF, VLEVEL_M, buf);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -112,6 +113,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /* Enable HSE Oscillator and Activate PLL with HSE as source */
   RCC_OscInitStruct.OscillatorType      = RCC_OSCILLATORTYPE_HSI;
@@ -143,6 +145,13 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART2;
+  PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
+  PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
   }
