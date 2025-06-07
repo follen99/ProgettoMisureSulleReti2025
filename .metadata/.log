@@ -37,3 +37,27 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64
 
 !ENTRY org.eclipse.cdt.core 1 0 2025-06-01 16:43:35.476
 !MESSAGE Indexed 'cmwx1zzabz_0xx' (46 sources, 134 headers) in 1.83 sec: 9,850 declarations; 58,944 references; 0 unresolved inclusions; 3 syntax errors; 5 unresolved names (0.0073%)
+!SESSION 2025-06-05 23:33:54.681 -----------------------------------------------
+eclipse.buildId=Version 1.18.1
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=it_IT
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.core.resources 2 10035 2025-06-05 23:33:57.080
+!MESSAGE The workspace exited with unsaved changes in the previous session; refreshing workspace to recover changes.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-06-05 23:34:00.993
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-06-05 23:34:00.994
+!MESSAGE Log4j2 initialized with config file D:\Git\ProgettoMisureSulleReti2025\.metadata\.log4j2.xml
+
+!ENTRY org.eclipse.cdt.core 1 0 2025-06-05 23:34:03.109
+!MESSAGE Indexed 'cmwx1zzabz_0xx' (0 sources, 0 headers) in 0,005 sec: 0 declarations; 0 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-06-05 23:34:03.169
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.cdt.core 1 0 2025-06-05 23:34:29.760
+!MESSAGE Indexed 'cmwx1zzabz_0xx' (0 sources, 0 headers) in 0 sec: 0 declarations; 0 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
