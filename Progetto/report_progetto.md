@@ -1,4 +1,4 @@
-# Report - Progetto Misuere per Comunicazione LoRa e Modulo GNSS
+# Report - Progetto Misure per Comunicazione LoRa e Modulo GNSS
 
 ## Obiettivo del Progetto
 Realizzare un sistema di localizzazione basato su microcontrollore STM32, in grado di comunicare via protocollo LoRa con due schede B-L072Z-LRWAN1 e un modulo GNSS (X-NUCLEO-GNSS1A1) montato su Arduino UNO. Il sistema consente di richiedere e trasmettere le coordinate GPS (latitudine e longitudine) su richiesta dell’utente.
@@ -24,14 +24,17 @@ Realizzare un sistema di localizzazione basato su microcontrollore STM32, in gra
 
 4. **Ricezione Slave**
    - La scheda Slave riceve le coordinate GPS, le memorizza e le stampa su monitor seriale.
+  
 
-## Foto del Progetto
-
-![alt text](progetto.jpg)
+<p align="center">
+  <img src="progetto.jpg" alt="Foto progetto" width="500"/>
+</p>
 
 ## Diagramma a Blocchi 
 
-
+<p align="center">
+  <img src="diagramma.png" alt="Foto progetto"/>
+</p>
 
 ## Flusso dei Dati
 
@@ -76,6 +79,8 @@ STM32 Slave → Ricezione coordinate GPS
   }
   ```
 
+- **I2C**: utilizzato per collegare il modulo GNSS all’Arduino UNO e permettere la lettura dei dati di posizione.
+
 - **LoRa**: modalità **P2P (Point-to-Point)** tra le due schede **B-L072Z-LRWAN1**, una configurata come Master, l’altra come Slave.
 
 ## Collegamenti Hardware UART
@@ -89,9 +94,9 @@ Per abilitare la comunicazione UART1 tra **B-L072Z-LRWAN1** e Arduino, sono stat
 Questi pin corrispondono all’interfaccia **USART1** sulla scheda **B-L072Z-LRWAN1**.  
 È importante che il collegamento GND sia comune, per garantire il corretto riferimento dei segnali seriali.
 
-### Foto dei Collegamenti
-
-![alt text](progetto2.jpg)
+<p align="center">
+  <img src="progetto2.jpg" alt="Collegamenti UART" width="500"/>
+</p>
 
 ## Formato del Messaggio GPS
 Esempio di messaggio ricevuto da Arduino e trasmesso via LoRa:
@@ -101,7 +106,7 @@ Esempio di messaggio ricevuto da Arduino e trasmesso via LoRa:
 
 ## Codice (Estratti Logici)
 
-### STM32 Master - Richiesta via UART
+### Master 
 ```c++
 BSP_PB_Init(BUTTON_USER, BUTTON_MODE_EXTI);
 ...
@@ -164,7 +169,7 @@ static void Master(void) {
 ### Arduino - Lettura GPS e invio dati
 
 
-### STM32 Slave - Ricezione via LoRa
+### Slave
 ```c++
 static void Slave(void) {
     Radio.Sleep();
