@@ -24,7 +24,7 @@ Realizzare un sistema di localizzazione basato su microcontrollore STM32, in gra
 
 4. **Ricezione Slave**
    - La scheda Slave riceve le coordinate GPS, le memorizza e le stampa su monitor seriale.
-  
+
 
 <p align="center">
   <img src="progetto.jpg" alt="Foto progetto" width="500"/>
@@ -71,7 +71,7 @@ STM32 Slave → Ricezione coordinate GPS
     huart1.Init.Parity = UART_PARITY_NONE;
     huart1.Init.Mode = UART_MODE_TX_RX;
     huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-
+  
     if (HAL_UART_Init(&huart1) != HAL_OK)
     {
       return;
@@ -167,6 +167,124 @@ static void Master(void) {
 ```
 
 ### Arduino - Lettura GPS e invio dati
+
+Il programma permette di interfacciarsi con il modulo GNSS **X-NUCLEO-GNSS1A1** tramite **I2C**, utilizzando la libreria *MicroNMEA* per il parsing dei dati NMEA. Il codice è pensato per Arduino Uno e gestisce la ricezione, il parsing e la trasmissione delle informazioni di posizione.
+
+#### Funzioni principali
+
+- `gpsHardwareReset()`: Esegue un reset hardware del modulo GNSS tramite il pin RESET, assicurando che il dispositivo parta in uno stato noto.
+
+  ```c++
+  void gpsHardwareReset()
+  {
+     // reset the device
+     digitalWrite(RESET_PIN, LOW);
+     delay(50);
+     digitalWrite(RESET_PIN, HIGH);
+  
+     // wait for reset to apply
+     delay(2000);
+  }
+  ```
+
+- `readI2C(char inBuff)`: Legge 32 byte dal modulo GNSS tramite I2C e li memorizza nel buffer passato come argomento. Serve per acquisire i dati NMEA trasmessi dal modulo.
+
+  ```c++
+  // Read 32 bytes from I2C
+  void readI2C(char *inBuff)
+  {
+     gps.beginTransmission(DEFAULT_DEVICE_ADDRESS);
+     gps.write((uint8_t)DEFAULT_DEVICE_PORT);
+     gps.endTransmission(false);
+     gps.requestFrom((uint8_t)DEFAULT_DEVICE_ADDRESS, (uint8_t)32);
+     int i = 0;
+     while (gps.available())
+     {
+        inBuff[i] = gps.read();
+        i++;
+     }
+  }
+  ```
+
+- `transferPositionUART()`: funzione che trasmette *latitudine* e *longitudine* nel formato CSV, esempio: `45.123456,12.123456`
+
+  ```c++
+  void transferPositionUART()
+  {
+     long latitude_mdeg = nmea.getLatitude();
+     long longitude_mdeg = nmea.getLongitude();
+     lastLatitude = latitude_mdeg;
+     lastLongitude = longitude_mdeg;
+  
+     console.print(latitude_mdeg / 1000000., 6);
+  
+     console.print(",");
+      
+     console.print(longitude_mdeg / 1000000., 6);
+  
+  
+     console.println();
+  }
+  ```
+
+#### setup()
+
+Inizializza la seriale, l’I2C, i pin necessari e il modulo GNSS. Invia alcuni comandi di configurazione al modulo e imposta l’interrupt sul segnale PPS.
+
+Il modulo GNSS emette un segnale `pps - Pulse Per Second`, che viene impostato ad alto una volta al secondo, in modo da **sincronizzare la lettura** dei dati tra l'arduino ed il modulo stesso. Di conseguenza il `pin 2` di Arduino viene configurato come *input*; allo stesso pin viene associata una **interrupt** che esegue la funzione `ppsHandler` ogni volta che il pin 2 viene impostato ad alto dal modulo GNSS (rising edge):
+
+```c++
+pinMode(2, INPUT);
+attachInterrupt(digitalPinToInterrupt(2), ppsHandler, RISING);
+
+...
+    
+void ppsHandler(void)
+{
+   ppsTriggered = true;
+}
+```
+
+#### loop()
+
+Nel noop principale si controlla se la flag `ppsTriggered` è true, nel caso in cui i dati dal modulo GNSS sono disponibili; si controlla, inoltre, se i dati rilevati dal sensore sono validi; se questi sono validi vengono salvati in una variabile di *ultima posizione conosciuta*:
+```c++
+if (ppsTriggered)
+{
+  ppsTriggered = false;
+  ledState = !ledState;
+  digitalWrite(LED_BUILTIN, ledState);
+
+  // Stampa solo se fix valido e almeno 1 satellite
+  if (nmea.isValid() && nmea.getNumSatellites() > 0)
+  {
+#ifdef DEBUG_MODE
+     printPositionFull();
+#else
+     transferPositionUART();
+#endif
+  }
+  nmea.clear();
+}
+```
+
+Inoltre, si controlla se è presente una **richiesta di posizione** da parte del modulo LoRa via **UART**; se arriva una richiesta, vengono inviati sulla porta seriale i dati relativi all'ultima posizione conosciuta:
+```c++
+while (Serial.available() > 0) {
+    char received = Serial.read();
+    if (received == '\n') { // fine messaggio (newline)
+      incomingMessage.trim(); // rimuove spazi e newline
+      if (incomingMessage == "invia") {
+        transferPositionUART();
+      }
+      incomingMessage = ""; // reset per il prossimo messaggio
+    } else {
+      incomingMessage += received;
+    }
+  }
+```
+
+**Nota**: l'ultima posizione viene stampata sia se arriva il messaggio di richiesta da parte del modulo LoRa, sia in caso contrario (in due funzioni differenti); questo per avere la percezione che la scheda GNSS sta ricevendo dati validi. 
 
 
 ### Slave
